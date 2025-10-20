@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div>
+    <h3>Bem-vindo {{ login.usuario }} ao Site do Aeroporto!</h3>
+    <h3>Idade: {{ login.idade }}</h3>
+    <h5>@meubahiamaltrata!</h5>
+</div>
+
+<div class="mt-3">
+    Bem-vindo ao Site do Aeroporto!
+    <a href="{{ url_for('novapag') }}" class="btn btn-primary">Link test</a>
+    <a href="{{url_for('login')}}" class="btn btn-primary">Login</a>
+</div>
+{% endblock %}

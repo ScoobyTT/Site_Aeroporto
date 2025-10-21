@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo
-from app.models import Cadastro
+from app.models import Usuario
 from app import db
 
-class CadastroLogin(FlaskForm):
+class Usuario(FlaskForm):
     nome = StringField('Nome', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     senha = PasswordField('Senha', validators=[DataRequired()])
@@ -12,22 +12,24 @@ class CadastroLogin(FlaskForm):
     submit = SubmitField('Cadastrar')
 
     def save(self):
-        cadastro = Cadastro(
+        novo_usuario = Usuario(
             nome=self.nome.data,
             email=self.email.data,
             senha=self.senha.data
         )
-        db.session.add(cadastro)
+        db.session.add(Usuario)
         db.session.commit()
-        return cadastro
+        return novo_usuario
 
 class LoginForm(FlaskForm):
     login = StringField('Login', validators=[DataRequired()])
     senha = PasswordField('Senha', validators=[DataRequired()])
     submit = SubmitField('Entrar')
 
-    def validate_login(self):
-        user = Cadastro.query.filter_by(email=self.login.data).first()
-        if user is None:
-            raise ValidationError('Login inválido. Por favor, tente novamente.')
-        return user
+   def validate_senha(self, field):
+        user = getattr(self, 'user', None)
+        if user is None or user.senha != self.senha.data:
+            raise ValidationError('Senha incorreta. Por favor, tente novamente.')
+
+def authenticate(self):
+        return getattr(self, 'user', None)

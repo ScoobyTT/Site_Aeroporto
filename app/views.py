@@ -14,10 +14,12 @@ def homepage():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        login_data = {
-            'login': form.login.data,
-            'senha': form.senha.data
-        }
+        user = form.authenticate()
+        if user:
+            return redirect(url_for('homepage'))
+        else:
+            form.login.errors.append('Login ou senha inválidos.')
+    return render_template('login.html', form=form)
         return render_template('login.html', login=login_data, form=form)
     return render_template('login.html', form=form)
 
@@ -25,9 +27,7 @@ def login():
 def cadastro():
     form = CadastroLogin()
     if form.validate_on_submit():
-        novo_usuario = User(username=form.nome.data, email=form.email.data)
-        db.session.add(novo_usuario)
-        db.session.commit()
+        form.save()
         return redirect(url_for('homepage'))
     return render_template('cadastro.html', form=form)
 

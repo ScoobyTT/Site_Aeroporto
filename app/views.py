@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for
 from app import app, db
-from app.models import User
-from app.forms import CadastroLogin, LoginForm
+from app.models import Usuario
+from app.forms import UsuarioForm, LoginForm
 
 @app.route('/')
 def homepage():
@@ -20,20 +20,52 @@ def login():
         else:
             form.login.errors.append('Login ou senha inválidos.')
     return render_template('login.html', form=form)
-        return render_template('login.html', login=login_data, form=form)
-    return render_template('login.html', form=form)
 
 @app.route('/cadastro/', methods=['GET', 'POST'])
 def cadastro():
-    form = CadastroLogin()
+    form = UsuarioForm()
     if form.validate_on_submit():
         form.save()
         return redirect(url_for('homepage'))
     return render_template('cadastro.html', form=form)
 
-@app.route('/nova/')
-def novapag():
-     
-    
 
-    return render_template('voos.html', login=login)
+from app.forms import VooForm
+from flask import render_template, redirect, url_for, flash
+
+@app.route('/voo/', methods=['GET', 'POST'])
+def voo():
+    form = VooForm()
+    if form.validate_on_submit():
+        # Aqui você pode salvar no banco se tiver um modelo Voo
+        flash('Voo cadastrado com sucesso!', 'success')
+        return redirect(url_for('homepage'))
+    return render_template('voo.html', form=form)
+
+
+@app.route('/voos/')
+def voos():
+    voos_info = [
+        {
+            'origem': 'Salvador',
+            'destino': 'São Paulo',
+            'data': '25/12/2025',
+            'horario': '14:30',
+            'preco': 'R$ 499,90'
+        },
+        {
+            'origem': 'Rio de Janeiro',
+            'destino': 'Fortaleza',
+            'data': '10/01/2026',
+            'horario': '09:00',
+            'preco': 'R$ 620,00'
+        },
+        {
+            'origem': 'Brasília',
+            'destino': 'Recife',
+            'data': '05/11/2025',
+            'horario': '18:45',
+            'preco': 'R$ 550,00'
+        }
+    ]
+    return render_template('voos.html', voos=voos_info)

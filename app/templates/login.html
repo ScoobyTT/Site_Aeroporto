@@ -5,6 +5,9 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <h2 class="mb-4 text-center">Entrar</h2>
+                {% if erro %}
+                    <div class="alert alert-danger">{{ erro }}</div>
+                {% endif %}
                 <form method="POST">
                     {{ form.hidden_tag() }}
 
@@ -34,7 +37,8 @@
                 {% endwith %}
             </div>
         </div>
-    </div>    <a href="{{ url_for('novapag') }}" class="btn btn-primary">Link test</a>
     <a href="{{url_for('cadastro')}}" class="btn btn-primary">Cadastrar</a>
 </div>
 {% endblock %}
+
+

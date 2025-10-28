@@ -13,13 +13,16 @@ def homepage():
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    erro = None
+
     if form.validate_on_submit():
         user = form.authenticate()
         if user:
             return redirect(url_for('homepage'))
         else:
-            form.login.errors.append('Login ou senha inválidos.')
-    return render_template('login.html', form=form)
+            erro = 'Login ou senha inválidos.'
+
+    return render_template('login.html', form=form, erro=erro)
 
 @app.route('/cadastro/', methods=['GET', 'POST'])
 def cadastro():

@@ -17,7 +17,7 @@ class UsuarioForm(FlaskForm):
             email=self.email.data,
             senha=self.senha.data
         )
-        db.session.add(novo_usuario)   # corrigido
+        db.session.add(novo_usuario)   
         db.session.commit()
         return novo_usuario
 
@@ -27,10 +27,10 @@ class LoginForm(FlaskForm):
     senha = PasswordField('Senha', validators=[DataRequired()])
     submit = SubmitField('Entrar')
 
-    def validate_senha(self, field):   # corrigida indentação
+    def validate_senha(self, field):   
         user = getattr(self, 'user', None)
         if user is None or user.senha != self.senha.data:
             raise ValidationError('Senha incorreta. Por favor, tente novamente.')
 
-    def authenticate(self):            # corrigida indentação
+    def authenticate(self):            
         return getattr(self, 'user', None)

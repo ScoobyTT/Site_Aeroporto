@@ -33,18 +33,6 @@ def cadastro():
     return render_template('cadastro.html', form=form)
 
 
-from app.forms import VooForm
-from flask import render_template, redirect, url_for, flash
-
-@app.route('/voo/', methods=['GET', 'POST'])
-def voo():
-    form = VooForm()
-    if form.validate_on_submit():
-        # Aqui você pode salvar no banco se tiver um modelo Voo
-        flash('Voo cadastrado com sucesso!', 'success')
-        return redirect(url_for('homepage'))
-    return render_template('voo.html', form=form)
-
 
 @app.route('/voos/')
 def voos():

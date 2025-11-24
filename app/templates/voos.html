@@ -1,8 +1,25 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div>
-    
-    MEU BAHIA MALTRATA.COM
-</div>
+  <h1>Minhas Passagens</h1>
+
+  {% if usuario %}
+    <p><strong>Usuário:</strong> {{ usuario.nome }} (Idade: {{ usuario.idade }})</p>
+  {% endif %}
+
+  {% if voos %}
+    <ul>
+      {% for passagem in voos %}
+        <li>
+          <strong>{{ passagem.origem }}</strong> → {{ passagem.destino }}
+          | R$ {{ "%.2f"|format(passagem.preco) }}
+        </li>
+      {% endfor %}
+    </ul>
+      <!-- Botão de voltar -->
+    <div class="text-center mt-4">
+      <a href="{{ url_for('homepage') }}" class="btn btn-secondary">⬅️ Voltar para Página Inicial</a>
+    </div>
+  {% else %}
+    <p>Nenhuma passagem encontrada.</p>
+  {% endif %}
 {% endblock %}

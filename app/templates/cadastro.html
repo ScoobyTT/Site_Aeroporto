@@ -31,6 +31,12 @@
                     <div class="d-grid">
                         {{ form.submit(class="btn btn-success") }}
                     </div>
+                      <!-- Botão de voltar -->
+    <div class="text-center mt-4">
+      <a href="{{ url_for('homepage') }}" class="btn btn-secondary">⬅️ Voltar para Página Inicial</a>
+    </div>
+  </div>
+
                 </form>
 
                 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -39,6 +45,7 @@
                       {% for category, message in messages %}
                         <div class="alert alert-{{ category }}">{{ message }}</div>
                       {% endfor %}
+                      
                     </div>
                   {% endif %}
                 {% endwith %}

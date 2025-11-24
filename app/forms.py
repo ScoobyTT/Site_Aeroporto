@@ -17,20 +17,29 @@ class UsuarioForm(FlaskForm):
             email=self.email.data,
             senha=self.senha.data
         )
-        db.session.add(novo_usuario)   
+        db.session.add(novo_usuario)
         db.session.commit()
         return novo_usuario
 
 
 class LoginForm(FlaskForm):
-    login = StringField('Login', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     senha = PasswordField('Senha', validators=[DataRequired()])
     submit = SubmitField('Entrar')
+    def authenticate(self):
+        usuario = Usuario.query.filter_by(email=self.email.data).first()
+        if usuario and usuario.senha == self.senha.data:
+            return usuario
+        return None
+    
 
-    def validate_senha(self, field):   
-        user = getattr(self, 'user', None)
-        if user is None or user.senha != self.senha.data:
-            raise ValidationError('Senha incorreta. Por favor, tente novamente.')
 
-    def authenticate(self):            
-        return getattr(self, 'user', None)
+class VooForm(FlaskForm):
+    origem = StringField('Origem', validators=[DataRequired()])
+    destino = StringField('Destino', validators=[DataRequired()])
+    data = StringField('Data do voo', validators=[DataRequired()])
+    horario = StringField('Horário', validators=[DataRequired()])
+    preco = StringField('Preço', validators=[DataRequired()])
+    submit = SubmitField('Cadastrar Voo')
+        
+

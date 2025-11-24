@@ -12,8 +12,11 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('voos')}}">Minhas Viagens</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('voo')}}">Cadastrar Voo</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('pagina_passagens', usuario_id=1) }}">Config</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('teste') }}">Logout</a> 
+                    </li>
+
                 </ul>
             </div>
         </div>
@@ -45,7 +48,20 @@
             <div class="col-12 text-center mt-3">
                 <button type="submit" class="btn btn-success">Buscar Passagens</button>
             </div>
+            
         </form>
+         <!-- Resultados da busca -->
+   {% if resultados %}
+    <ul>
+        {% for p in resultados %}
+            <li>{{ p.origem }} → {{ p.destino }} em {{ p.data }} — R$ {{ "%.2f"|format(p.preco) }}</li>
+        {% endfor %}
+    </ul>
+{% elif resultados is not none %}
+    <p class="text-danger">Nenhuma passagem encontrada.</p>
+{% endif %}
+
+
     </section>
 
     <!-- Destinos populares -->

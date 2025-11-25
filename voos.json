@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "origem": "salvador ",
+    "destino": "sao paulo",
+    "data": null,
+    "horario": null,
+    "preco": 5555.0,
+    "usuario_id": 1
+  },
+  {
+    "id": 2,
+    "origem": "recife ",
+    "destino": "bahia",
+    "data": null,
+    "horario": null,
+    "preco": 5555.0,
+    "usuario_id": 1
+  },
+  {
+    "id": 3,
+    "origem": "rio de janeiro",
+    "destino": "aguas claras",
+    "data": null,
+    "horario": null,
+    "preco": 111111111111.0,
+    "usuario_id": 1
+  },
+  {
+    "id": 4,
+    "origem": "florianopolis",
+    "destino": "feira nde santana",
+    "data": null,
+    "horario": null,
+    "preco": 55555555555.0,
+    "usuario_id": 1
+  },
+  {
+    "id": 5,
+    "origem": "sao paulo",
+    "destino": "rio de janeiro",
+    "data": null,
+    "horario": null,
+    "preco": 7777.0,
+    "usuario_id": 1
+  },
+  {
+    "id": 6,
+    "origem": "salvador ",
+    "destino": "sao paulo",
+    "data": null,
+    "horario": null,
+    "preco": 710.0,
+    "usuario_id": 1
+  },
+  {
+    "id": 7,
+    "origem": "salvador ",
+    "destino": "sao paulo",
+    "data": null,
+    "horario": null,
+    "preco": 850.0,
+    "usuario_id": 1
+  }
+]

@@ -1,45 +1,172 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
-from app.models import Usuario
-from app import db
+from wtforms.validators import DataRequired, Email, Length, EqualTo
+import json
+import os
+from datetime import datetime
 
+
+# =======================
+# Caminhos dos arquivos
+# =======================
+
+USUARIOS_FILE = "usuarios.json"
+VOOS_FILE = "voos.json"
+
+
+# =======================
+# Funções utilitárias JSON
+# =======================
+
+def carregar_json(file):
+    if not os.path.exists(file):
+        return []
+    try:
+        with open(file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return []
+
+
+def salvar_json(file, data):
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def proximo_id(registros):
+    if not registros:
+        return 1
+    return max(item.get("id", 0) for item in registros) + 1
+
+
+# =======================
+# Formulário de Cadastro
+# =======================
 class UsuarioForm(FlaskForm):
-    nome = StringField('Nome', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    senha = PasswordField('Senha', validators=[DataRequired()])
-    confirmSenha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
-    submit = SubmitField('Cadastrar')
+    nome = StringField(
+        "Nome",
+        validators=[
+            DataRequired(message="O nome é obrigatório."),
+            Length(min=2, message="O nome deve ter pelo menos 2 caracteres.")
+        ]
+    )
 
+    email = StringField(
+        "Email",
+        validators=[
+            DataRequired(message="O email é obrigatório."),
+            Email(message="Digite um email válido.")
+        ]
+    )
+
+    confirmar_email = StringField(
+        "Confirmar Email",
+        validators=[
+            DataRequired(message="Confirme seu email."),
+            Email(message="Digite um email válido."),
+            EqualTo("email", message="Os emails não coincidem.")
+        ]
+    )
+
+    senha = PasswordField(
+        "Senha",
+        validators=[
+            DataRequired(message="A senha é obrigatória."),
+            Length(min=4, message="A senha deve ter pelo menos 4 caracteres.")
+        ]
+    )
+
+    confirmar_senha = PasswordField(
+        "Confirmar Senha",
+        validators=[
+            DataRequired(message="Confirme sua senha."),
+            EqualTo("senha", message="As senhas não coincidem.")
+        ]
+    )
+
+    submit = SubmitField("Cadastrar")
+
+    # Salva usuário em JSON
     def save(self):
-        novo_usuario = Usuario(
-            nome=self.nome.data,
-            email=self.email.data,
-            senha=self.senha.data
-        )
-        db.session.add(novo_usuario)
-        db.session.commit()
+        usuarios = carregar_json(USUARIOS_FILE)
+
+        novo_usuario = {
+            "id": proximo_id(usuarios),
+            "nome": self.nome.data,
+            "email": self.email.data,
+            "senha": self.senha.data
+        }
+
+        usuarios.append(novo_usuario)
+        salvar_json(USUARIOS_FILE, usuarios)
+
         return novo_usuario
 
 
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    senha = PasswordField('Senha', validators=[DataRequired()])
-    submit = SubmitField('Entrar')
-    def authenticate(self):
-        usuario = Usuario.query.filter_by(email=self.email.data).first()
-        if usuario and usuario.senha == self.senha.data:
-            return usuario
-        return None
-    
+# =======================
+# Formulário de Login
+# =======================
 
+class LoginForm(FlaskForm):
+    email = StringField(
+        "Email",
+        validators=[
+            DataRequired(message="O email é obrigatório."),
+            Email(message="Digite um email válido.")
+        ]
+    )
+
+    senha = PasswordField(
+        "Senha",
+        validators=[
+            DataRequired(message="A senha é obrigatória.")
+        ]
+    )
+
+    submit = SubmitField("Entrar")
+
+    # Autentica lendo JSON
+    def authenticate(self):
+        usuarios = carregar_json(USUARIOS_FILE)
+
+        for usuario in usuarios:
+            if usuario["email"] == self.email.data and usuario["senha"] == self.senha.data:
+                return usuario
+
+        return None
+
+
+# =======================
+# Formulário de Voo
+# =======================
 
 class VooForm(FlaskForm):
-    origem = StringField('Origem', validators=[DataRequired()])
-    destino = StringField('Destino', validators=[DataRequired()])
-    data = StringField('Data do voo', validators=[DataRequired()])
-    horario = StringField('Horário', validators=[DataRequired()])
-    preco = StringField('Preço', validators=[DataRequired()])
-    submit = SubmitField('Cadastrar Voo')
-        
+    origem = StringField("Origem", validators=[DataRequired()])
+    destino = StringField("Destino", validators=[DataRequired()])
+    data = StringField("Data do voo", validators=[DataRequired()])
+    horario = StringField("Horário", validators=[DataRequired()])
+    preco = StringField("Preço", validators=[DataRequired()])
+    submit = SubmitField("Cadastrar Voo")
+
+    def save(self, usuario_id):
+            voos = carregar_json(VOOS_FILE)
+
+            novo_voo = {
+                "id": proximo_id(voos),
+                "origem": self.origem.data,
+                "destino": self.destino.data,
+                "data": self.data.data,
+                "horario": self.horario.data,
+                "preco": float(self.preco.data),
+                "usuario_id": usuario_id,
+                "data_cadastro": datetime.utcnow().isoformat()
+            }
+
+            voos.append(novo_voo)
+            salvar_json(VOOS_FILE, voos)
+
+            # integração com árvore B
+            btree_voos.insert(novo_voo["id"], novo_voo)
+
+            return novo_voo
 

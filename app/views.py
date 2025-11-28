@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from app import app
 from app.models import Usuario, Passagem
 from app.forms import UsuarioForm, LoginForm, VooForm
@@ -27,30 +27,54 @@ def homepage():
 
     # GET
     return render_template("index.html")
+    
+ADMIN_EMAIL = "admin@gmail.com"
+ADMIN_SENHA = "admin123"
+
+@app.route('/conf')
+def config():
+    print("SESSION ATUAL:", dict(session))   # <<< debug importante
+    # 1. Verifica se existe login
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+    
+    session_usuario = session["usuario"]
+    # 2. Verifica se o usuário logado é o admin
+    if session["usuario"] != ADMIN_EMAIL:
+        flash("Acesso negado: apenas administradores podem acessar esta página.", "danger")
+        return redirect(url_for("login"))
+    
+    voos = carregar_json(VOOS_FILE)
+    return render_template("configa.html", voos=voos)
 
 
-@app.route('/teste/')
-def teste():
-    return jsonify({"mensagem": "Teste funcionando!"}), 200
+
+
+@app.route('/logouti')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
 
 
 # Login: mantém rota e método, responde JSON
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
             user = form.authenticate()
             if user:
-                return jsonify({
-                    "mensagem": "Login realizado com sucesso.",
-                    "usuario": {"id": user["id"], "nome": user["nome"], "email": user["email"]}
-                }), 200
+                session["usuario"] = user["email"]
+                flash("Login realizado com sucesso!", "success")
+                return redirect(url_for("homepage"))
             return jsonify({"erro": "Login ou senha inválidos."}), 401
         return jsonify({"erro": "Dados inválidos", "detalhes": form.errors}), 400
 
     # GET
     return render_template('login.html', form=form)
+
+
 
 
 @app.route('/cadastro/', methods=['GET', 'POST'])
@@ -98,11 +122,6 @@ def voo():
     # GET
     return render_template('voo.html', form=form)
 
-
-@app.route('/passagens')
-def pagina_passagens():
-    voos = carregar_json(VOOS_FILE)
-    return render_template("passagens.html", voos=voos)
 
 
 
@@ -322,19 +341,6 @@ def editar_compra(compra_id):
     salvar_json(COMPRAS_FILE, compras)
     return jsonify({"mensagem": "Compra atualizada com sucesso!"}), 200
 
-
-@app.route("/api/voos")
-def api_voos():
-    origem = request.args.get("origem", "").lower()
-    destino = request.args.get("destino", "").lower()
-    voos = carregar_json(VOOS_FILE)
-
-    filtrados = [
-        v for v in voos
-        if (not origem or origem in v["origem"].lower())
-        and (not destino or destino in v["destino"].lower())
-    ]
-    return jsonify(filtrados), 200
 
 
 # Exemplo de uso de Árvore B para armazenar voos (teste)

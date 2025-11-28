@@ -1,25 +1,79 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block content %}
-  <h1>Minhas Passagens</h1>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">comprar passagem</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('config') }}">Config</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">sair</a></li>
 
-  {% if usuario %}
-    <p><strong>Usuário:</strong> {{ usuario.nome }} (Idade: {{ usuario.idade }})</p>
-  {% endif %}
 
-  {% if voos %}
-    <ul>
-      {% for passagem in voos %}
-        <li>
-          <strong>{{ passagem.origem }}</strong> → {{ passagem.destino }}
-          | R$ {{ "%.2f"|format(passagem.preco) }}
-        </li>
-      {% endfor %}
-    </ul>
-      <!-- Botão de voltar -->
-    <div class="text-center mt-4">
-      <a href="{{ url_for('homepage') }}" class="btn btn-secondary">⬅️ Voltar para Página Inicial</a>
+
+                </li>
+
+            </ul>
+        </div>
     </div>
-  {% else %}
-    <p>Nenhuma passagem encontrada.</p>
-  {% endif %}
+</nav>
+
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-center">Minhas Passagens</h2>
+
+    {% if voos|length == 0 %}
+        <div class="alert alert-info text-center">
+            Nenhuma passagem cadastrada ainda.
+        </div>
+    {% else %}
+
+        <div class="row">
+        {% for voo in voos %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm border-0 rounded-4">
+
+                    <div class="card-body">
+                        <h5 class="card-title text-primary fw-bold">
+                            {{ voo.origem }} → {{ voo.destino }}
+                        </h5>
+
+                        <p class="card-text mb-1">
+                            <strong>Data:</strong> {{ voo.data }}
+                        </p>
+
+                        <p class="card-text mb-1">
+                            <strong>Horário:</strong> {{ voo.horario }}
+                        </p>
+
+                        <p class="card-text mb-1">
+                            <strong>Preço:</strong> R$ {{ "%.2f"|format(voo.preco) }}
+                        </p>
+
+                        <p class="card-text text-muted small">
+                            <strong>Cadastrado em:</strong><br>
+                            {{ voo.data_cadastro }}
+                        </p>
+
+                        <a href="#" class="btn btn-primary w-100 mt-2">
+                            Detalhes
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+    {% endif %}
+</div>
 {% endblock %}

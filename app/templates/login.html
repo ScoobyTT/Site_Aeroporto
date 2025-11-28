@@ -1,6 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">comprar passagem</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('config') }}">ADM</a></li>
+              <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">sair</a></li>
+
+
+
+              </li>
+
+          </ul>
+      </div>
+  </div>
+</nav>
+
+
 <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -46,5 +72,3 @@
 
 </div>
 {% endblock %}
-
-

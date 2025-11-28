@@ -43,6 +43,8 @@ def config():
     if session["usuario"] != ADMIN_EMAIL:
         flash("Acesso negado: apenas administradores podem acessar esta página.", "danger")
         return redirect(url_for("login"))
+    if "usuario" in session:
+        return render_template("configa.html")
     
     voos = carregar_json(VOOS_FILE)
     return render_template("configa.html", voos=voos)
@@ -64,10 +66,13 @@ def login():
     if request.method == 'POST':
         if form.validate_on_submit():
             user = form.authenticate()
-            if user:
+            if user:#por um if de verificacao pra saber qual o login
                 session["usuario"] = user["email"]
                 flash("Login realizado com sucesso!", "success")
-                return redirect(url_for("homepage"))
+                if user["email"] == ADMIN_EMAIL:
+                    return redirect(url_for("config"))
+                else:
+                    return redirect(url_for("homepage"))
             return jsonify({"erro": "Login ou senha inválidos."}), 401
         return jsonify({"erro": "Dados inválidos", "detalhes": form.errors}), 400
 

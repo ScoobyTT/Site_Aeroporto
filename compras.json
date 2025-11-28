@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-11-25T02:27:04.813061"
+  },
+  {
+    "id": 2,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-11-25T02:27:26.500831"
+  },
+  {
+    "id": 3,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-11-26T20:37:03.480376"
+  },
+  {
+    "id": 4,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-11-26T20:37:28.495038"
+  },
+  {
+    "id": 5,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-11-26T20:37:36.851196"
+  },
+  {
+    "id": 6,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-11-28T02:26:47.671432"
+  }
+]

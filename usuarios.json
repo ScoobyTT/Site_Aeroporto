@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "nome": "christian",
+    "email": "christian@gmail.com",
+    "senha": "123456"
+  },
+  {
+    "id": 2,
+    "nome": "bostaliquida",
+    "email": "bostaliquida@gmail.com",
+    "senha": "japinha"
+  },
+  {
+    "id": 3,
+    "nome": "administrador",
+    "email": "admin@gmail.com",
+    "senha": "admin123"
+  }
+]

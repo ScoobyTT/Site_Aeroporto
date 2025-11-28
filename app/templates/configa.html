@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">comprar passagem</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('config') }}">ADM</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">sair</a></li>
+
+
+
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+  <div class="container">
+    <h1 class="mb-4 text-primary">✈️ Gerenciar Passagens</h1>
+
+    <!-- Card de adicionar passagem -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title">Adicionar Passagem</h2>
+        <form id="formAdicionar" class="row g-3">
+          <div class="col-md-6">
+            <label for="origem" class="form-label">Origem</label>
+            <input type="text" id="origem" class="form-control" placeholder="Ex: Salvador">
+          </div>
+          <div class="col-md-6">
+            <label for="destino" class="form-label">Destino</label>
+            <input type="text" id="destino" class="form-control" placeholder="Ex: São Paulo">
+          </div>
+          <div class="col-md-6">
+            <label for="preco" class="form-label">Preço</label>
+            <input type="number" id="preco" step="0.01" class="form-control" placeholder="Ex: 499.90">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-success">Adicionar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lista de passagens -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title">Minhas Passagens</h2>
+        <ul id="listaPassagens" class="list-group mt-3"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão de voltar -->
+    <div class="text-center mt-4">
+      <a href="{{ url_for('homepage') }}" class="btn btn-secondary">⬅️ Voltar para Página Inicial</a>
+    </div>
+  </div>
+
+  <script>
+    const usuarioId = 1; // Ajuste conforme o usuário logado
+
+    // Adicionar
+    document.getElementById("formAdicionar").addEventListener("submit", e => {
+      e.preventDefault();
+      const dados = {
+        origem: document.getElementById("origem").value,
+        destino: document.getElementById("destino").value,
+        preco: parseFloat(document.getElementById("preco").value),
+        usuario_id: usuarioId
+      };
+
+      fetch("/api/passagens", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.mensagem);
+        listarPassagens();
+      });
+    });
+
+    // Listar
+    function listarPassagens() {
+      fetch(`/api/passagens/${usuarioId}`)
+        .then(res => res.json())
+        .then(passagens => {
+          const lista = document.getElementById("listaPassagens");
+          lista.innerHTML = "";
+          passagens.forEach(p => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.innerHTML = `
+              <span><strong>${p.origem}</strong> → ${p.destino} | R$ ${p.preco.toFixed(2)}</span>
+              <div>
+                <button class="btn btn-warning btn-sm me-2" onclick="editarPassagem(${p.id})">Editar</button>
+                <button class="btn btn-danger btn-sm" onclick="removerPassagem(${p.id})">Remover</button>
+              </div>
+            `;
+            lista.appendChild(li);
+          });
+        });
+    }
+
+    // Editar
+    function editarPassagem(id) {
+      const novoPreco = prompt("Digite o novo preço:");
+      fetch(`/api/passagens/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ preco: parseFloat(novoPreco) })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.mensagem);
+        listarPassagens();
+      });
+    }
+
+    // Remover
+    function removerPassagem(id) {
+      fetch(`/api/passagens/${id}`, { method: "DELETE" })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.mensagem);
+          listarPassagens();
+        });
+    }
+
+    listarPassagens();
+  </script>
+{% endblock %}

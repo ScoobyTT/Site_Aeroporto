@@ -50,6 +50,14 @@ class UsuarioForm(FlaskForm):
             Length(min=2, message="O nome deve ter pelo menos 2 caracteres.")
         ]
     )
+    cpf = StringField(
+        "CPF",
+        validators=[
+            DataRequired(message="O CPF é obrigatório."),
+            Length(min=11, max=11, message="O CPF deve ter 11 caracteres.")
+        ]
+    )
+
 
     email = StringField(
         "Email",
@@ -92,6 +100,7 @@ class UsuarioForm(FlaskForm):
 
         novo_usuario = {
             "id": proximo_id(usuarios),
+            "cpf": self.cpf.data,
             "nome": self.nome.data,
             "email": self.email.data,
             "senha": self.senha.data
@@ -146,6 +155,8 @@ class VooForm(FlaskForm):
     data = StringField("Data do voo", validators=[DataRequired()])
     horario = StringField("Horário", validators=[DataRequired()])
     preco = StringField("Preço", validators=[DataRequired()])
+    n_assentos = StringField("Número de Assentos", validators=[DataRequired()])
+    n_aeronave = StringField("Número da Aeronave", validators=[DataRequired()])
     submit = SubmitField("Cadastrar Voo")
 
     def save(self, usuario_id):
@@ -170,3 +181,4 @@ class VooForm(FlaskForm):
 
             return novo_voo
 
+btree_voos = None  # Inicialização da árvore B deve ser feita na aplicação principal

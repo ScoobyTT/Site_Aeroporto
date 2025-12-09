@@ -27,7 +27,7 @@
 
 
   <div class="container">
-    <h1 class="mb-4 text-primary">✈️ Gerenciar Passagens</h1>
+    <h1 class="text-center mt-4 mb-4">✈️ Gerenciar Passagens</h1>
 
     <!-- Card de adicionar passagem -->
     <div class="card mb-4 shadow-sm">
@@ -54,19 +54,26 @@
     </div>
 
     <!-- Lista de passagens -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mt-4 mb-4">
       <div class="card-body">
-        <h2 class="card-title">Minhas Passagens</h2>
+        <h2 class="card-title">Passagens Ativas</h2>
         <ul id="listaPassagens" class="list-group mt-3"></ul>
       </div>
     </div>
-  </div>
-
-  <!-- Botão de voltar -->
-    <div class="text-center mt-4">
+    <!-- Botão Cliente -->
+    <div class="card shadow-sm mb-4">
+      <a href="{{ url_for('cliente_page') }}" class="btn btn-secondary">Config Clientes</a>
+    </div>
+      <!-- Botão de voltar -->
+    <div class="card shadow-sm mb-4">
       <a href="{{ url_for('homepage') }}" class="btn btn-secondary">⬅️ Voltar para Página Inicial</a>
     </div>
+     
   </div>
+  
+  </div>
+
+  
 
   <script>
     const usuarioId = 1; // Ajuste conforme o usuário logado

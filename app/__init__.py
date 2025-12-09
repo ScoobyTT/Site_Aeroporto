@@ -11,7 +11,7 @@ migrate = Migrate(app, db)
 
 from app import views
 from app.views import homepage
-from app.models import Usuario
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,11 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from app import app
-from app.models import Usuario, Passagem
 from app.forms import UsuarioForm, LoginForm, VooForm
 from app.forms import carregar_json, salvar_json, proximo_id
 from app.forms import USUARIOS_FILE, VOOS_FILE
 from datetime import datetime
-
+from flask import Flask
+import json, os
 
 # Homepage: busca passagens por origem/destino/data
 @app.route("/", methods=["GET", "POST"])
@@ -30,6 +30,7 @@ def homepage():
     
 ADMIN_EMAIL = "admin@gmail.com"
 ADMIN_SENHA = "admin123"
+
 
 @app.route('/conf')
 def config():
@@ -372,3 +373,99 @@ def api_voos():
 
     percorrer(btree_voos.root)
     return jsonify(resultados), 200
+
+
+
+
+
+
+
+
+# GET 1 cliente específico
+@app.route('/api/clientt/<int:id>', methods=['GET'])
+def cliente(id):
+    clientes = carregar_json(USUARIOS_FILE)
+    cliente = next((c for c in clientes if c["id"] == id), None)
+    if not cliente:
+        return jsonify({"erro": "Cliente não encontrado"}), 404
+    return jsonify(cliente), 200
+
+
+USUARIOS_FILE = "usuarios.json"
+
+def carregar_json(file):
+    if not os.path.exists(file):
+        return []
+    try:
+        with open(file, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        return []
+
+def salvar_json(file, data):
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+def proximo_id(registros):
+    if not registros:
+        return 1
+    return max(item.get("id", 0) for item in registros) + 1
+
+# Página HTML
+@app.route("/clientes")
+def cliente_page():
+    return render_template("cliente.html")
+
+# GET - listar todos
+@app.route("/api/clientes", methods=["GET"])
+def listar_clientes():
+    clientes = carregar_json(USUARIOS_FILE)
+    return jsonify(clientes), 200
+
+# POST - criar novo cliente
+@app.route("/api/clientes", methods=["POST"])
+def criar_cliente():
+    dados = request.get_json()
+    if not dados or "nome" not in dados or "email" not in dados or "senha" not in dados:
+        return jsonify({"erro": "Dados inválidos"}), 400
+
+    clientes = carregar_json(USUARIOS_FILE)
+    novo_cliente = {
+        "id": proximo_id(clientes),
+        "nome": dados["nome"],
+        "email": dados["email"],
+        "senha": dados["senha"]
+    }
+    clientes.append(novo_cliente)
+    salvar_json(USUARIOS_FILE, clientes)
+    return jsonify({"mensagem": "Cliente criado com sucesso!"}), 201
+
+# PUT - editar cliente
+@app.route("/api/clientes/<int:id>", methods=["PUT"])
+def editar_cliente(id):
+    dados = request.get_json()
+    clientes = carregar_json(USUARIOS_FILE)
+
+    for c in clientes:
+        if c["id"] == id:
+            c["nome"] = dados.get("nome", c["nome"])
+            c["email"] = dados.get("email", c["email"])
+            if "senha" in dados:
+                c["senha"] = dados["senha"]
+            salvar_json(USUARIOS_FILE, clientes)
+            return jsonify({"mensagem": "Cliente atualizado com sucesso!"}), 200
+
+    return jsonify({"erro": "Cliente não encontrado"}), 404
+
+# DELETE - remover cliente
+@app.route("/api/clientes/<int:id>", methods=["DELETE"])
+def remover_cliente(id):
+    clientes = carregar_json(USUARIOS_FILE)
+    tamanho_antes = len(clientes)
+    clientes = [c for c in clientes if c["id"] != id]
+
+    if len(clientes) == tamanho_antes:
+        return jsonify({"erro": "Cliente não encontrado"}), 404
+
+    salvar_json(USUARIOS_FILE, clientes)
+    return jsonify({"mensagem": "Cliente removido com sucesso!"}), 200

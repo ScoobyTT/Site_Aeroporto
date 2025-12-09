@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro') }}">Cadastro</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">Comprar passagem</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('config') }}">ADM</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Sair</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">👥 Gerenciar Clientes</h1>
+
+    <!-- Alert feedback -->
+    <div id="alertBox" class="alert d-none"></div>
+
+    <!-- Lista de clientes -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Clientes Registrados</h2>
+            <table class="table table-striped mt-3">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaClientes"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Botão voltar -->
+    <div class="card shadow-sm mb-4">
+        <a href="{{ url_for('config') }}" class="btn btn-secondary">⬅️ Voltar para Configurações</a>
+    </div>
+</div>
+
+<script>
+    function showAlert(message, type="success") {
+        const alertBox = document.getElementById("alertBox");
+        alertBox.className = `alert alert-${type}`;
+        alertBox.textContent = message;
+        alertBox.classList.remove("d-none");
+        setTimeout(() => alertBox.classList.add("d-none"), 3000);
+    }
+
+    function listarClientes() {
+        fetch("/api/clientes")
+            .then(res => res.json())
+            .then(clientes => {
+                const tabela = document.getElementById("listaClientes");
+                tabela.innerHTML = "";
+
+                if (clientes.length === 0) {
+                    tabela.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">Nenhum cliente encontrado.</td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                clientes.forEach(c => {
+                    const linha = document.createElement("tr");
+                    linha.innerHTML = `
+                        <td>${c.id}</td>
+                        <td>${c.nome}</td>
+                        <td>${c.email}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${c.id})">Excluir</button>
+                        </td>
+                    `;
+                    tabela.appendChild(linha);
+                });
+            })
+            .catch(err => {
+                showAlert("Erro ao carregar clientes.", "danger");
+                console.error(err);
+            });
+    }
+
+    function removerCliente(event, id) {
+        if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = "Excluindo...";
+
+        fetch(`/api/clientes/${id}`, { method: "DELETE" })
+            .then(res => res.json())
+            .then(data => {
+                showAlert(data.mensagem || data.erro, data.erro ? "danger" : "success");
+                listarClientes();
+            })
+            .catch(() => showAlert("Erro ao excluir cliente.", "danger"))
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = "Excluir";
+            });
+    }
+
+    listarClientes();
+</script>
+
+{% endblock %}

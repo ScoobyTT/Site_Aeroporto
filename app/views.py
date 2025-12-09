@@ -243,6 +243,13 @@ def buscar_passagens():
 
 
 
+@app.route("/api/voos/<int:id>", methods=["GET"])
+def buscar_voo(id):
+    voo = btree_voos.search(id)
+    if voo:
+        return jsonify(voo), 200
+    return jsonify({"erro": "Voo não encontrado"}), 404
+
 
 
 

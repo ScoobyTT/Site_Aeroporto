@@ -4,39 +4,19 @@ from wtforms.validators import DataRequired, Email, Length, EqualTo
 import json
 import os
 from datetime import datetime
-
+from app.btree import BTree
+from app.btree_instances import btree_voos, btree_usuarios
+from app.utils import carregar_json, salvar_json, proximo_id, VOOS_FILE, USUARIOS_FILE
 
 # =======================
 # Caminhos dos arquivos
 # =======================
 
-USUARIOS_FILE = "usuarios.json"
-VOOS_FILE = "voos.json"
 
 
 # =======================
 # Funções utilitárias JSON
 # =======================
-
-def carregar_json(file):
-    if not os.path.exists(file):
-        return []
-    try:
-        with open(file, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError:
-        return []
-
-
-def salvar_json(file, data):
-    with open(file, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-
-
-def proximo_id(registros):
-    if not registros:
-        return 1
-    return max(item.get("id", 0) for item in registros) + 1
 
 
 # =======================
@@ -108,6 +88,7 @@ class UsuarioForm(FlaskForm):
 
         usuarios.append(novo_usuario)
         salvar_json(USUARIOS_FILE, usuarios)
+        btree_usuarios.insert(novo_usuario["id"], novo_usuario)
 
         return novo_usuario
 
@@ -180,5 +161,3 @@ class VooForm(FlaskForm):
             btree_voos.insert(novo_voo["id"], novo_voo)
 
             return novo_voo
-
-btree_voos = None  # Inicialização da árvore B deve ser feita na aplicação principal

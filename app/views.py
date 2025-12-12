@@ -501,12 +501,16 @@ def buscar_cliente():
     if chave is None:
         return jsonify({"erro": "Parâmetro 'q' é obrigatório"}), 400
 
-    # tenta em todas as árvores
-    cliente = (
-        arvore_nome.search(chave)
-        or arvore_cpf.search(chave)
-        or btree_usuarios.search(chave)
-    )
+    # tenta nome
+    cliente = arvore_nome.search(chave)
+
+    # tenta cpf
+    if not cliente:
+        cliente = arvore_cpf.search(chave)
+
+    # tenta ID (apenas se for número)
+    if not cliente and chave.isdigit():
+        cliente = btree_usuarios.search(int(chave))
 
     if cliente:
         return jsonify(cliente), 200

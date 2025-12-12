@@ -1,18 +1,21 @@
 [
   {
     "id": 1,
+    "cpf": "000.777.005",
     "nome": "christian",
     "email": "christian@gmail.com",
     "senha": "123456"
   },
   {
     "id": 2,
+    "cpf": "000.777.004",
     "nome": "bostaliquida",
     "email": "bostaliquida@gmail.com",
     "senha": "japinha"
   },
   {
     "id": 3,
+    "cpf": "000.777.003",
     "nome": "administrador",
     "email": "admin@gmail.com",
     "senha": "admin123"
@@ -22,6 +25,27 @@
     "cpf": "000.777.006",
     "nome": "anderson",
     "email": "anderson@gmail.com",
+    "senha": "123456"
+  },
+  {
+    "id": 5,
+    "cpf": "000.777.011",
+    "nome": "carlos",
+    "email": "carlos@gmail.com",
+    "senha": "123456"
+  },
+  {
+    "id": 6,
+    "cpf": "028.888.888",
+    "nome": "duda",
+    "email": "duda@gmail.com",
+    "senha": "123456"
+  },
+  {
+    "id": 7,
+    "cpf": "000.888.885",
+    "nome": "zenildo",
+    "email": "zenildo@gmail.com",
     "senha": "123456"
   }
 ]

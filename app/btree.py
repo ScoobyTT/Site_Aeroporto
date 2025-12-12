@@ -1,3 +1,4 @@
+
 class BTreeNode:
     def __init__(self, t, leaf=False):
         self.t = t  # grau mínimo
@@ -59,3 +60,26 @@ class BTree:
         if not node.leaf:
             new_node.children = node.children[t:(2 * t)]
             node.children = node.children[0:t - 1]
+
+    def list_in_order(self):
+        resultado = []
+        self._in_order(self.root, resultado)
+        return resultado
+
+    def _in_order(self, node, resultado):
+        if node is None:
+            return
+        
+        # Para cada chave do nó
+        for i in range(len(node.keys)):
+            # 1. Visita o filho da esquerda da chave
+            if not node.leaf:
+                self._in_order(node.children[i], resultado)
+
+            # 2. Adiciona o VALUE da chave (o cliente)
+            resultado.append(node.keys[i][1])
+
+        # 3. Visita o último filho
+        if not node.leaf:
+            self._in_order(node.children[len(node.keys)], resultado)
+

@@ -28,13 +28,21 @@
     <div id="alertBox" class="alert d-none"></div>
 
     <!-- Lista de clientes -->
-    <div class="card shadow-sm mb-4">
+    <div class="search-item mb-4">
+        <label>Buscar cliente</label><br>
+        <input id="campoBusca" type="text" class="form-control" placeholder="Nome,CPF ou Email">
+         <div class="card shadow-sm mt-2">
+      <a href="btn btn-primary mb-3" class="btn btn-secondary">Buscar</a>
+    </div>
+    </div>
+    
         <div class="card-body">
             <h2 class="card-title">Clientes Registrados</h2>
             <table class="table table-striped mt-3">
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>CPF</th>
                         <th>Nome</th>
                         <th>Email</th>
                         <th>Ações</th>
@@ -43,12 +51,13 @@
                 <tbody id="listaClientes"></tbody>
             </table>
         </div>
+        <div class="card shadow-sm mb-4">
+        <a href="{{ url_for('config') }}" class="btn btn-secondary">⬅️ Voltar para Configurações</a>
+    </div>
     </div>
 
     <!-- Botão voltar -->
-    <div class="card shadow-sm mb-4">
-        <a href="{{ url_for('config') }}" class="btn btn-secondary">⬅️ Voltar para Configurações</a>
-    </div>
+    
 </div>
 
 <script>
@@ -59,6 +68,8 @@
         alertBox.classList.remove("d-none");
         setTimeout(() => alertBox.classList.add("d-none"), 3000);
     }
+
+    
 
     function listarClientes() {
         fetch("/api/clientes")
@@ -80,6 +91,7 @@
                     const linha = document.createElement("tr");
                     linha.innerHTML = `
                         <td>${c.id}</td>
+                        <td>${c.cpf}</td>
                         <td>${c.nome}</td>
                         <td>${c.email}</td>
                         <td>
@@ -90,7 +102,7 @@
                 });
             })
             .catch(err => {
-                showAlert("Erro ao carregar clientes.", "danger");
+                showAlert("Erro ao carregar clienteszzz.", "danger");
                 console.error(err);
             });
     }
@@ -114,6 +126,51 @@
                 btn.textContent = "Excluir";
             });
     }
+    function buscarCliente() {
+    const termo = document.getElementById("campoBusca").value.trim();
+
+    // ✅ Se o campo estiver vazio → lista tudo
+    if (!termo) {
+        listarClientes();
+        return;
+    }
+
+    // ✅ Se tiver algo → busca filtrada
+    fetch(`/api/clientes/buscar?q=${encodeURIComponent(termo)}`)
+        .then(res => res.json())
+        .then(cliente => {
+            const tabela = document.getElementById("listaClientes");
+            tabela.innerHTML = "";
+
+            // ✅ Se não encontrou nada
+            if (!cliente || cliente.mensagem || cliente.erro) {
+                tabela.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Nenhum cliente encontrado.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            // ✅ Se encontrou → mostra só ele
+            const linha = document.createElement("tr");
+            linha.innerHTML = `
+                <td>${cliente.id}</td>
+                <td>${cliente.cpf}</td>
+                <td>${cliente.nome}</td>
+                <td>${cliente.email}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${cliente.id})">Excluir</button>
+                </td>
+            `;
+            tabela.appendChild(linha);
+        })
+        .catch(err => {
+            showAlert("Erro ao buscar cliente.", "danger");
+            console.error(err);
+        });
+}
+
 
     listarClientes();
 </script>

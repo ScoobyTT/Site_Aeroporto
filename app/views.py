@@ -6,6 +6,7 @@ from app.forms import USUARIOS_FILE, VOOS_FILE
 from datetime import datetime
 from flask import Flask
 import json, os
+from app.btree_instances import btree_voos, btree_usuarios, arvore_nome, arvore_cpf, btree_usuarios
 
 # Homepage: busca passagens por origem/destino/data
 @app.route("/", methods=["GET", "POST"])
@@ -83,18 +84,19 @@ def login():
 
 
 
+from flask import flash
+
 @app.route('/cadastro/', methods=['GET', 'POST'])
 def cadastro():
     form = UsuarioForm()
 
     if form.validate_on_submit():
         usuario = form.save()
-        return jsonify({
-            "mensagem": "Usuário cadastrado com sucesso!",
-            "usuario": usuario
-        }), 201
+        flash("Usuário cadastrado com sucesso!", "success")
+        return redirect(url_for('cadastro'))
 
     return render_template('cadastro.html', form=form)
+
 
 
 # Página de voos do usuário: mantém rota
@@ -424,10 +426,23 @@ def cliente_page():
     return render_template("cliente.html")
 
 # GET - listar todos
+from flask import jsonify
+
 @app.route("/api/clientes", methods=["GET"])
 def listar_clientes():
-    clientes = carregar_json(USUARIOS_FILE)
-    return jsonify(clientes), 200
+    clientes = arvore_nome.list_in_order()
+
+    # converter objetos Python para JSON
+    clientes_json = []
+    for c in clientes:
+        clientes_json.append({
+            "id": c["id"],
+            "cpf": c["cpf"],
+            "nome": c["nome"],
+            "email": c["email"]
+        })
+
+    return jsonify(clientes_json)
 
 # POST - criar novo cliente
 @app.route("/api/clientes", methods=["POST"])
@@ -446,6 +461,8 @@ def criar_cliente():
     clientes.append(novo_cliente)
     salvar_json(USUARIOS_FILE, clientes)
     return jsonify({"mensagem": "Cliente criado com sucesso!"}), 201
+
+
 
 # PUT - editar cliente
 @app.route("/api/clientes/<int:id>", methods=["PUT"])
@@ -476,3 +493,23 @@ def remover_cliente(id):
 
     salvar_json(USUARIOS_FILE, clientes)
     return jsonify({"mensagem": "Cliente removido com sucesso!"}), 200
+
+@app.route("/api/clientes/buscar")
+def buscar_cliente():
+    chave = request.args.get("q")
+
+    if chave is None:
+        return jsonify({"erro": "Parâmetro 'q' é obrigatório"}), 400
+
+    # tenta em todas as árvores
+    cliente = (
+        arvore_nome.search(chave)
+        or arvore_cpf.search(chave)
+        or btree_usuarios.search(chave)
+    )
+
+    if cliente:
+        return jsonify(cliente), 200
+
+    return jsonify({"mensagem": "Cliente não encontrado"}), 404
+

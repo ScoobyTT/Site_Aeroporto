@@ -1,0 +1,98 @@
+from flask import Flask, request, jsonify
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo
+import json
+import os
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'segredo-super-seguro'
+
+# =====================
+# Persistência em JSON
+# =====================
+USUARIOS_FILE = "usuarios.json"
+VOOS_FILE = "voos.json"
+
+def carregar_json(file):
+    if not os.path.exists(file):
+        return []
+    with open(file, "r", encoding="utf-8") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+def salvar_json(file, data):
+    with open(file, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+def proximo_id(registros):
+    return (max((r.get("id", 0) for r in registros), default=0) + 1)
+
+# =====================
+# Forms (mantidos)
+# =====================
+class UsuarioForm(FlaskForm):
+    nome = StringField('Nome', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    senha = PasswordField('Senha', validators=[DataRequired()])
+    confirmSenha = PasswordField('Confirmar Senha', validators=[DataRequired(), EqualTo('senha')])
+    submit = SubmitField('Cadastrar')
+
+    # Mantém o método save, agora salvando em JSON
+    def save(self):
+        usuarios = carregar_json(USUARIOS_FILE)
+        novo_usuario = {
+            "id": proximo_id(usuarios),
+            "nome": self.nome.data,
+            "email": self.email.data,
+            "senha": self.senha.data
+        }
+        usuarios.append(novo_usuario)
+        salvar_json(USUARIOS_FILE, usuarios)
+        return novo_usuario
+
+
+class LoginForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    senha = PasswordField('Senha', validators=[DataRequired()])
+    submit = SubmitField('Entrar')
+
+    # Mantém authenticate, agora validando em JSON
+    def authenticate(self):
+        usuarios = carregar_json(USUARIOS_FILE)
+        for usuario in usuarios:
+            if usuario["email"] == self.email.data and usuario["senha"] == self.senha.data:
+                return usuario
+        return None
+
+
+class VooForm(FlaskForm):
+    origem = StringField('Origem', validators=[DataRequired()])
+    destino = StringField('Destino', validators=[DataRequired()])
+    data = StringField('Data do voo', validators=[DataRequired()])
+    horario = StringField('Horário', validators=[DataRequired()])
+    preco = StringField('Preço', validators=[DataRequired()])
+    submit = SubmitField('Cadastrar Voo')
+
+    # Mantém save, agora salvando em JSON
+    def save(self, usuario_id=1):
+        voos = carregar_json(VOOS_FILE)
+        novo_voo = {
+            "id": proximo_id(voos),
+            "origem": self.origem.data,
+            "destino": self.destino.data,
+            "data": self.data.data,
+            "horario": self.horario.data,
+            "preco": float(self.preco.data),
+            "usuario_id": usuario_id
+        }
+        voos.append(novo_voo)
+        salvar_json(VOOS_FILE, voos)
+        return novo_voo
+
+# =====================
+# Rotas (mantidas)
+# =====================
+

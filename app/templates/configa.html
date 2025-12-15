@@ -46,6 +46,20 @@
             <label for="preco" class="form-label">Preço</label>
             <input type="number" id="preco" step="0.01" class="form-control" placeholder="Ex: 499.90">
           </div>
+          
+          <div class="col-md-6">
+            <label for="n_assentos" class="form-label">Número de Assentos</label>
+            <input type="number" id="n_assentos" class="form-control" placeholder="Ex: 45">
+          </div>
+          
+          <div class="col-md-6">
+            <label for="t_aeronave" class="form-label">Tipo de Aeronave</label>
+            <input type="text" id="t_aeronave" class="form-control" placeholder="Ex: T888">
+          </div>
+          <div class="col-12">
+            <label for="milhagem" class="form-label">Milhas</label>
+            <input type="number" id="milhagem" class="form-control" placeholder="Ex: 1200">
+          </div>
           <div class="col-12">
             <button type="submit" class="btn btn-success">Adicionar</button>
           </div>
@@ -85,6 +99,9 @@
         origem: document.getElementById("origem").value,
         destino: document.getElementById("destino").value,
         preco: parseFloat(document.getElementById("preco").value),
+        n_assentos: document.getElementById("n_assentos").value,
+        t_aeronave: document.getElementById("t_aeronave").value,
+        milhagem: document.getElementById("milhagem").value,
         usuario_id: usuarioId
       };
 

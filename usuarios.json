@@ -47,5 +47,12 @@
     "nome": "zenildo",
     "email": "zenildo@gmail.com",
     "senha": "123456"
+  },
+  {
+    "id": 8,
+    "cpf": "555.555.555-74",
+    "nome": "Anderson",
+    "email": "anderson11@gmail.com",
+    "senha": "123456"
   }
 ]

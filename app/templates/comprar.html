@@ -118,6 +118,7 @@
                 <input id="input-origem" type="text" placeholder="Insira sua cidade de origem">
             </div>
 
+
             <!-- DESTINO -->
             <div class="search-item">
                 <label>Destino</label><br>
@@ -236,10 +237,13 @@
                     const div = document.createElement("div");
                     div.className = "card p-3 mt-2 text-dark bg-light";
 
-                    div.innerHTML = `
+                    div.innerHTML = `                        
                         <h5>${v.origem} → ${v.destino}</h5>
-                        <p>Data: ${v.data || "Não informada"}</p>
-                        <p>Horário: ${v.horario || "Não informado"}</p>
+                        <p>Código do voo: ${v.id}</p>
+                        <p>Assentos disponíveis: ${v.n_assentos}</p>
+                        <p>Aeronave: ${v.t_aeronave}</p>
+                        <p>Milhagem: ${v.milhagem} km</p>
+                        
                         <p><strong>Preço: R$ ${v.preco.toFixed(2)}</strong></p>
                         <button class="btn btn-success"
                                 onclick="comprarPassagem(${v.id})">

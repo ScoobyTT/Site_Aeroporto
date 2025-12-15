@@ -1,11 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
-import json
-import os
+import json, os
 from datetime import datetime
-from app.btree import BTree
-from app.btree_instances import btree_voos, btree_usuarios
+
+import app.btree_instances as trees
 from app.utils import carregar_json, salvar_json, proximo_id, VOOS_FILE, USUARIOS_FILE
 
 # =======================
@@ -36,7 +35,7 @@ class UsuarioForm(FlaskForm):
         "CPF",
         validators=[
             DataRequired(message="O CPF é obrigatório."),
-            Length(min=11, max=11, message="O CPF deve ter 11 caracteres.")
+            Length(min=11, max=14, message="O CPF deve ter 11 caracteres.")
         ]
     )
 
@@ -90,7 +89,7 @@ class UsuarioForm(FlaskForm):
 
         usuarios.append(novo_usuario)
         salvar_json(USUARIOS_FILE, usuarios)
-        btree_usuarios.insert(novo_usuario["id"], novo_usuario)
+        trees.btree_usuarios.insert(novo_usuario["id"], novo_usuario)
 
         return novo_usuario
 
@@ -139,7 +138,9 @@ class VooForm(FlaskForm):
     horario = StringField("Horário", validators=[DataRequired()])
     preco = StringField("Preço", validators=[DataRequired()])
     n_assentos = StringField("Número de Assentos", validators=[DataRequired()])
-    n_aeronave = StringField("Número da Aeronave", validators=[DataRequired()])
+    t_aeronave = StringField("Número da Aeronave", validators=[DataRequired()])
+    tipo_passagem = StringField("Tipo de Passagem", validators=[DataRequired()])
+    milhagem = StringField("Milhagem", validators=[DataRequired()])
     submit = SubmitField("Cadastrar Voo")
 
     def save(self, usuario_id):
@@ -152,14 +153,15 @@ class VooForm(FlaskForm):
                 "data": self.data.data,
                 "horario": self.horario.data,
                 "preco": float(self.preco.data),
+                "n_assentos": int(self.n_assentos.data),
+                "t_aeronave": self.t_aeronave.data,
+                "tipo_passagem": self.tipo_passagem.data,
+                "milhagem": int(self.milhagem.data),
                 "usuario_id": usuario_id,
                 "data_cadastro": datetime.utcnow().isoformat()
             }
 
             voos.append(novo_voo)
             salvar_json(VOOS_FILE, voos)
-
-            # integração com árvore B
-            btree_voos.insert(novo_voo["id"], novo_voo)
-
+            trees.btree_voos.insert(novo_voo["id"], novo_voo)
             return novo_voo

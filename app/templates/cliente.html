@@ -130,20 +130,20 @@
     function buscarCliente() {
     const termo = document.getElementById("campoBusca").value.trim();
 
-    // ✅ Se o campo estiver vazio → lista tudo
+    //  Se o campo estiver vazio → lista tudo
     if (!termo) {
         listarClientes();
         return;
     }
 
-    // ✅ Se tiver algo → busca filtrada
+    //  Se tiver algo → busca filtrada
     fetch(`/api/clientes/buscar?q=${encodeURIComponent(termo)}`)
         .then(res => res.json())
         .then(cliente => {
             const tabela = document.getElementById("listaClientes");
             tabela.innerHTML = "";
 
-            // ✅ Se não encontrou nada
+            //  Se não encontrou nada
             if (!cliente || cliente.mensagem || cliente.erro) {
                 tabela.innerHTML = `
                     <tr>
@@ -153,7 +153,7 @@
                 return;
             }
 
-            // ✅ Se encontrou → mostra só ele
+            //  Se encontrou → mostra só ele
             const linha = document.createElement("tr");
             linha.innerHTML = `
                 <td>${cliente.id}</td>

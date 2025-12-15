@@ -1,101 +1,193 @@
 {% extends "base.html" %}
 
+{% block title %}Minhas Passagens - Passagens Online{% endblock %}
+
 {% block content %}
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">comprar passagem</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('config') }}">Config</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">sair</a></li>
-
-
-
-                </li>
-
-            </ul>
-        </div>
+<div class="container mt-4 fade-in">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-ticket-perforated-fill text-primary"></i> Minhas Passagens
+        </h1>
+        <p class="lead text-muted">Visualize todas as suas passagens compradas</p>
     </div>
-</nav>
-
-
-<div class="container mt-4">
-
-    <h2 class="mb-4 text-center">Minhas Passagens</h2>
 
     {% if btree_voos|length == 0 %}
-        <div class="alert alert-info text-center">
-            Nenhuma passagem cadastrada ainda.
+        <div class="card card-custom text-center p-5">
+            <i class="bi bi-inbox" style="font-size: 4rem; color: #6c757d;"></i>
+            <h4 class="mt-3 text-muted">Nenhuma passagem encontrada</h4>
+            <p class="text-muted">Você ainda não possui passagens cadastradas.</p>
+            <a href="{{ url_for('comprar_pass') }}" class="btn btn-primary btn-custom mt-3 mx-auto" style="max-width: 300px;">
+                <i class="bi bi-cart-plus"></i> Comprar Passagem
+            </a>
         </div>
     {% else %}
-
-        <div class="row">
-        {% for voo in btree_voos %}
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm border-0 rounded-4">
+        <div class="row g-4">
+            {% for voo in btree_voos %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-custom h-100 border-0 shadow-sm">
+                    <!-- Cabeçalho do Card -->
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h5 class="mb-0">
+                            <i class="bi bi-airplane-fill"></i> Voo #{{ voo.id }}
+                        </h5>
+                    </div>
 
                     <div class="card-body">
-                        <h5 class="card-subtitle mb-2 text-muted">
-                            Voo ID: {{ voo.id }}
-                        </h5>
-                        <h5 class="card-subtitle mb-3 text-muted">
-                            Passageiro: {{ voo.cliente_nome }}
-                        </h5>
-                        <h5 class="card-subtitle mb-3 text-muted">
-                            CPF: {{ voo.cliente_cpf }}
-                        </h5>
-                        <h5 class="card-subtitle mb-3 text-muted">
-                            Email: {{ voo.cliente_email }}
-                        </h5>
-                        <h5 class="card-title text-primary fw-bold">
-                            Aeronave: {{ voo.tipo_aeronave }}
-                        </h5>
-                        <h5 class="card-title text-primary fw-bold">
-                            Assento: {{ voo.assento }}
-                        </h5>
-                        <h5 class="card-title text-primary fw-bold">
-                            Milhagem: {{ voo.milhagem }} milhas
-                        </h5>
+                        <!-- Informações do Passageiro -->
+                        <div class="mb-3 pb-3 border-bottom">
+                            <h6 class="text-muted mb-2">
+                                <i class="bi bi-person-badge"></i> Passageiro
+                            </h6>
+                            <p class="mb-1"><strong>{{ voo.cliente_nome }}</strong></p>
+                            <small class="text-muted">
+                                <i class="bi bi-card-text"></i> CPF: {{ voo.cliente_cpf }}
+                            </small><br>
+                            <small class="text-muted">
+                                <i class="bi bi-envelope"></i> {{ voo.cliente_email }}
+                            </small>
+                        </div>
 
-                        <h5 class="card-title text-primary fw-bold">
-                            {{ voo.origem }} → {{ voo.destino }}
-                        </h5>
+                        <!-- Rota -->
+                        <div class="mb-3">
+                            <h5 class="text-primary fw-bold text-center mb-2">
+                                <i class="bi bi-arrow-right-circle"></i>
+                                {{ voo.origem }} → {{ voo.destino }}
+                            </h5>
+                        </div>
 
-                        <p class="card-text mb-1">
-                            <strong>Data:</strong> {{ voo.data }}
-                        </p>
+                        <!-- Detalhes do Voo -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-calendar3"></i> Data
+                                    </small>
+                                    <strong>{{ voo.data }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-clock"></i> Horário
+                                    </small>
+                                    <strong>{{ voo.horario }}</strong>
+                                </div>
+                            </div>
+                        </div>
 
-                        <p class="card-text mb-1">
-                            <strong>Horário:</strong> {{ voo.horario }}
-                        </p>
+                        <!-- Informações Adicionais -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-airplane"></i> Aeronave
+                                    </small>
+                                    <strong>{{ voo.tipo_aeronave }}</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-chair"></i> Assento
+                                    </small>
+                                    <strong>{{ voo.assento }}</strong>
+                                </div>
+                            </div>
+                        </div>
 
-                        <p class="card-text mb-1">
-                            <strong>Preço:</strong> R$ {{ "%.2f"|format(voo.preco) }}
-                        </p>
+                        <!-- Milhagem e Preço -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-warning bg-opacity-10 rounded">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-star-fill text-warning"></i> Milhagem
+                                    </small>
+                                    <strong>{{ voo.milhagem }} milhas</strong>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-success bg-opacity-10 rounded">
+                                    <small class="text-muted d-block">
+                                        <i class="bi bi-currency-dollar"></i> Valor
+                                    </small>
+                                    <strong class="text-success">R$ {{ "%.2f"|format(voo.preco) }}</strong>
+                                </div>
+                            </div>
+                        </div>
 
-                        <p class="card-text text-muted small">
-                            <strong>Cadastrado em:</strong><br>
-                            {{ voo.data_cadastro }}
-                        </p>
+                        <!-- Data de Cadastro -->
+                        <div class="text-center">
+                            <small class="text-muted">
+                                <i class="bi bi-calendar-check"></i> Comprado em: {{ voo.data_cadastro }}
+                            </small>
+                        </div>
+                    </div>
 
-                        <a href="#" class="btn btn-primary w-100 mt-2">
-                            Detalhes
-                        </a>
-
+                    <!-- Footer do Card -->
+                    <div class="card-footer bg-transparent border-top-0">
+                        <button class="btn btn-outline-primary btn-custom w-100" onclick="verDetalhes {{ voo.id }}">
+                            <i class="bi bi-info-circle"></i> Ver Detalhes
+                        </button>
                     </div>
                 </div>
             </div>
-        {% endfor %}
+            {% endfor %}
         </div>
 
+        <!-- Resumo -->
+        <div class="card card-custom mt-5 bg-light">
+            <div class="card-body text-center">
+                <h5 class="mb-3">
+                    <i class="bi bi-graph-up"></i> Resumo
+                </h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <h3 class="text-primary">{{ btree_voos|length }}</h3>
+                            <p class="text-muted mb-0">Passagens Compradas</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <h3 class="text-success">
+                                {% set total = namespace(valor=0) %}
+                                {% for voo in btree_voos %}
+                                    {% set total.valor = total.valor + voo.preco %}
+                                {% endfor %}
+                                R$ {{ "%.2f"|format(total.valor) }}
+                            </h3>
+                            <p class="text-muted mb-0">Total Gasto</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3">
+                            <h3 class="text-warning">
+                                {% set milhas = namespace(total=0) %}
+                                {% for voo in btree_voos %}
+                                    {% set milhas.total = milhas.total + voo.milhagem %}
+                                {% endfor %}
+                                {{ milhas.total }}
+                            </h3>
+                            <p class="text-muted mb-0">Milhas Acumuladas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
+
+    <!-- Botão de Voltar -->
+    <div class="text-center my-5">
+        <a href="{{ url_for('homepage') }}" class="btn btn-secondary btn-custom px-5">
+            <i class="bi bi-arrow-left"></i> Voltar para Home
+        </a>
+    </div>
 </div>
+
+<script>
+function verDetalhes(vooId) {
+    alert(`Detalhes do voo #${vooId}\n\nEsta funcionalidade será implementada em breve!`);
+    // Aqui você pode adicionar um modal ou redirecionar para uma página de detalhes
+}
+</script>
 {% endblock %}

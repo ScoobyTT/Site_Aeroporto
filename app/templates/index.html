@@ -1,107 +1,180 @@
 {% extends "base.html" %}
 
+{% block title %}Início - Passagens Online{% endblock %}
+
 {% block content %}
-<!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
-               
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">comprar passagem</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('config') }}">ADM</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">sair</a></li>
+<!-- Hero Section -->
+<header class="bg-white py-5 shadow-sm fade-in">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold text-primary mb-3">
+            <i class="bi bi-airplane"></i> Encontre sua próxima viagem
+        </h1>
+        <p class="lead text-secondary">Compare preços e compre passagens aéreas com facilidade</p>
+    </div>
+</header>
 
-
-
-                    </li>
-
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-
-    <!-- Hero Section -->
-    <header class="bg-white py-5">
-        <div class="container text-center">
-            <h1 class="display-5">Encontre sua próxima viagem</h1>
-            <p class="lead">Compare preços e compre passagens aéreas com facilidade</p>
-        </div>
-    </header>
-
-    <!-- Busca de passagens -->
-    <section class="container my-5">
+<!-- Busca de Passagens -->
+<section class="container my-5 fade-in">
+    <div class="card card-custom p-4">
+        <h3 class="text-center mb-4">
+            <i class="bi bi-search"></i> Buscar Passagens
+        </h3>
         <form class="row g-3">
             <div class="col-md-4">
-                <label for="origem" class="form-label">Origem</label>
-                <input type="text" class="form-control" id="origem" placeholder="Ex: Salvador">
+                <label for="origem" class="form-label fw-bold">
+                    <i class="bi bi-geo-alt"></i> Origem
+                </label>
+                <input type="text" class="form-control form-control-custom" id="origem" placeholder="Ex: Salvador">
             </div>
             <div class="col-md-4">
-                <label for="destino" class="form-label">Destino</label>
-                <input type="text" class="form-control" id="destino" placeholder="Ex: São Paulo">
+                <label for="destino" class="form-label fw-bold">
+                    <i class="bi bi-geo-alt-fill"></i> Destino
+                </label>
+                <input type="text" class="form-control form-control-custom" id="destino" placeholder="Ex: São Paulo">
             </div>
             <div class="col-md-4">
-                <label for="data" class="form-label">Data da viagem</label>
-                <input type="date" class="form-control" id="data">
+                <label for="data" class="form-label fw-bold">
+                    <i class="bi bi-calendar-event"></i> Data da Viagem
+                </label>
+                <input type="date" class="form-control form-control-custom" id="data">
             </div>
-            <div class="col-12 text-center mt-3">
-                <button type="submit" class="btn btn-success">Buscar Passagens</button>
+            <div class="col-12 text-center mt-4">
+                <button type="submit" class="btn btn-success btn-custom btn-lg px-5">
+                    <i class="bi bi-search"></i> Buscar Passagens
+                </button>
+            </div>
+        </form>
+        
+        <!-- Resultados da busca -->
+        {% if resultados %}
+            <div class="mt-4">
+                <h5 class="text-primary mb-3">Resultados Encontrados:</h5>
+                <div class="list-group">
+                    {% for p in resultados %}
+                        <div class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="mb-1">
+                                        <i class="bi bi-arrow-right-circle"></i>
+                                        {{ p.origem }} → {{ p.destino }}
+                                    </h5>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> {{ p.data }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-success rounded-pill fs-6">
+                                    R$ {{ "%.2f"|format(p.preco) }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% elif resultados is not none %}
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-exclamation-triangle"></i> Nenhum resultado encontrado
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Destinos Populares -->
+<section class="bg-white py-5 shadow-sm">
+    <div class="container">
+        <h2 class="text-center mb-5 fw-bold">
+            <i class="bi bi-star-fill text-warning"></i> Destinos Populares
+        </h2>
+        <div class="row g-4">
+            <!-- Rio de Janeiro -->
+            <div class="col-md-4">
+                <div class="card card-custom h-100 border-0">
+                    <img src="{{ url_for('static', filename='IMG/rio.jpg') }}" 
+                         class="card-img-top" 
+                         alt="Rio de Janeiro"
+                         style="height: 250px; object-fit: cover; border-radius: 10px 10px 0 0;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold text-primary">
+                            <i class="bi bi-geo-alt-fill"></i> Rio de Janeiro
+                        </h5>
+                        <p class="card-text text-muted">Sol, praia e diversão garantida.</p>
+                        <a href="{{ url_for('comprar_pass') }}" class="btn btn-outline-primary btn-custom mt-2">
+                            Ver Ofertas
+                        </a>
+                    </div>
+                </div>
             </div>
             
-        </form>
-         <!-- Resultados da busca -->
-   {% if resultados %}
-    <ul>
-        {% for p in resultados %}
-            <li>{{ p.origem }} → {{ p.destino }} em {{ p.data }} — R$ {{ "%.2f"|format(p.preco) }}</li>
-        {% endfor %}
-    </ul>
-{% elif resultados is not none %}
-    <p class="text-danger"></p>
-{% endif %}
-
-
-    </section>
-
-    <!-- Destinos populares -->
-    <section class="bg-white py-5">
-        <div class="container">
-            <h2 class="mb-4 text-center">Destinos Populares</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{{url_for('static', filename='IMG/rio.jpg') }}" class="card-img-top" alt="Rio de Janeiro">
-                        <div class="card-body">
-                            <h5 class="card-title">Rio de Janeiro</h5>
-                            <p class="card-text">Sol, praia e diversão garantida.</p>
-                        </div>
+            <!-- São Paulo -->
+            <div class="col-md-4">
+                <div class="card card-custom h-100 border-0">
+                    <img src="{{ url_for('static', filename='IMG/sao_paulo.jpg') }}" 
+                         class="card-img-top" 
+                         alt="São Paulo"
+                         style="height: 250px; object-fit: cover; border-radius: 10px 10px 0 0;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold text-primary">
+                            <i class="bi bi-geo-alt-fill"></i> São Paulo
+                        </h5>
+                        <p class="card-text text-muted">A capital dos negócios e da cultura urbana.</p>
+                        <a href="{{ url_for('comprar_pass') }}" class="btn btn-outline-primary btn-custom mt-2">
+                            Ver Ofertas
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{{url_for('static', filename='IMG/sao_paulo.jpg') }}" class="card-img-top" alt="São Paulo">
-                        <div class="card-body">
-                            <h5 class="card-title">São Paulo</h5>
-                            <p class="card-text">A capital dos negócios e da cultura urbana.</p>
-                        </div>
+            </div>
+            
+            <!-- Fortaleza -->
+            <div class="col-md-4">
+                <div class="card card-custom h-100 border-0">
+                    <img src="{{ url_for('static', filename='IMG/fortal.jpg') }}" 
+                         class="card-img-top" 
+                         alt="Fortaleza"
+                         style="height: 250px; object-fit: cover; border-radius: 10px 10px 0 0;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title fw-bold text-primary">
+                            <i class="bi bi-geo-alt-fill"></i> Fortaleza
+                        </h5>
+                        <p class="card-text text-muted">Belezas naturais e clima tropical.</p>
+                        <a href="{{ url_for('comprar_pass') }}" class="btn btn-outline-primary btn-custom mt-2">
+                            Ver Ofertas
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="{{ url_for('static', filename='IMG/fortal.jpg') }}" class="card-img-top" alt="Fortaleza">
-                        
-                        <div class="card-body">
-                            <h5 class="card-title">Fortaleza</h5>
-                            <p class="card-text">Belezas naturais e clima tropical.</p>
-                        </div>
-                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção de Vantagens -->
+<section class="container my-5">
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="card card-custom border-0 h-100 p-4">
+                <div class="card-body">
+                    <i class="bi bi-shield-check text-success" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 fw-bold">Compra Segura</h5>
+                    <p class="text-muted">Suas informações protegidas em todas as transações</p>
                 </div>
-                
-    </section>{% endblock %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-custom border-0 h-100 p-4">
+                <div class="card-body">
+                    <i class="bi bi-clock-history text-primary" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 fw-bold">Atendimento 24h</h5>
+                    <p class="text-muted">Suporte disponível a qualquer momento</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-custom border-0 h-100 p-4">
+                <div class="card-body">
+                    <i class="bi bi-tag text-warning" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 fw-bold">Melhores Preços</h5>
+                    <p class="text-muted">Encontre as melhores ofertas do mercado</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

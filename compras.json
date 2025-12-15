@@ -4,5 +4,23 @@
     "voo_id": 1,
     "usuario_id": 1,
     "data_compra": "2025-12-15T20:13:00.142131"
+  },
+  {
+    "id": 2,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-12-15T20:58:35.477337"
+  },
+  {
+    "id": 3,
+    "voo_id": 1,
+    "usuario_id": 1,
+    "data_compra": "2025-12-15T21:00:00.652023"
+  },
+  {
+    "id": 4,
+    "voo_id": 1,
+    "usuario_id": 3,
+    "data_compra": "2025-12-15T21:15:58.466438"
   }
 ]

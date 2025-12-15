@@ -1,91 +1,139 @@
+<!-- ====================================== -->
+<!-- CONFIGA.HTML - Gerenciar Passagens -->
+<!-- ====================================== -->
 {% extends 'base.html' %}
+
+{% block title %}Administração - Passagens Online{% endblock %}
+
 {% block content %}
-<!-- Navbar -->
-
-
-
-  <div class="container">
-    <h1 class="text-center mt-4 mb-4">✈️ Gerenciar Passagens</h1>
-
-    <!-- Card de adicionar passagem -->
-    <div class="card mb-4 shadow-sm">
-      <div class="card-body">
-        <h2 class="card-title">Adicionar Passagem</h2>
-        <form id="formAdicionar" class="row g-3">
-          <div class="col-md-6">
-            <label for="origem" class="form-label">Origem</label>
-            <input type="text" id="origem" class="form-control" placeholder="Ex: Salvador">
-          </div>
-          <div class="col-md-6">
-            <label for="destino" class="form-label">Destino</label>
-            <input type="text" id="destino" class="form-control" placeholder="Ex: São Paulo">
-          </div>
-          <div class="col-md-6">
-            <label for="preco" class="form-label">Preço</label>
-            <input type="number" id="preco" step="0.01" class="form-control" placeholder="Ex: 499.90">
-          </div>
-          
-          <div class="col-md-6">
-            <label for="n_assentos" class="form-label">Número de Assentos</label>
-            <input type="number" id="n_assentos" class="form-control" placeholder="Ex: 45">
-          </div>
-          
-          <div class="col-md-6">
-            <label for="t_aeronave" class="form-label">Tipo de Aeronave</label>
-            <input type="text" id="t_aeronave" class="form-control" placeholder="Ex: T888">
-          </div>
-          <div class="col-12">
-            <label for="milhagem" class="form-label">Milhas</label>
-            <input type="number" id="milhagem" class="form-control" placeholder="Ex: 1200">
-          </div>
-          <div class="col-12">
-            <label for="Tipo_passagem" class="form-label">Tipo de Passagem</label>
-            <input type="text" id="Tipo_passagem" class="form-control" placeholder="Ex: Economica">
-          </div>
-          <div class="col-12">
-            <label for="data" class="form-label">Data da Viagem</label>
-            <input type="date" id="data" class="form-control">
-          </div>
-          <div class="col-12">
-            <label for="hora" class="form-label">Hora da Viagem</label>
-            <input type="time" id="hora" class="form-control">
-          </div>
-          <div class="col-12">
-            <button type="submit" class="btn btn-success">Adicionar</button>
-          </div>
-        </form>
-      </div>
+<div class="container mt-4 fade-in">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-gear-fill text-primary"></i> Gerenciar Passagens
+        </h1>
+        <p class="lead text-muted">Painel de administração do sistema</p>
     </div>
 
-    <!-- Lista de passagens -->
-    <div class="card shadow-sm mt-4 mb-4">
-      <div class="card-body">
-        <h2 class="card-title">Passagens Ativas</h2>
-        <ul id="listaPassagens" class="list-group mt-3"></ul>
-      </div>
+    <!-- Card de Adicionar Passagem -->
+    <div class="card card-custom mb-4">
+        <div class="card-body p-4">
+            <h3 class="card-title mb-4">
+                <i class="bi bi-plus-circle text-success"></i> Adicionar Nova Passagem
+            </h3>
+            <form id="formAdicionar">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="origem" class="form-label fw-bold">
+                            <i class="bi bi-geo-alt"></i> Origem
+                        </label>
+                        <input type="text" id="origem" class="form-control form-control-custom" placeholder="Ex: Salvador">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="destino" class="form-label fw-bold">
+                            <i class="bi bi-geo-alt-fill"></i> Destino
+                        </label>
+                        <input type="text" id="destino" class="form-control form-control-custom" placeholder="Ex: São Paulo">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="preco" class="form-label fw-bold">
+                            <i class="bi bi-currency-dollar"></i> Preço
+                        </label>
+                        <input type="number" id="preco" step="0.01" class="form-control form-control-custom" placeholder="499.90">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="n_assentos" class="form-label fw-bold">
+                            <i class="bi bi-people"></i> Assentos
+                        </label>
+                        <input type="number" id="n_assentos" class="form-control form-control-custom" placeholder="45">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="t_aeronave" class="form-label fw-bold">
+                            <i class="bi bi-airplane"></i> Aeronave
+                        </label>
+                        <input type="text" id="t_aeronave" class="form-control form-control-custom" placeholder="Boeing 737">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="milhagem" class="form-label fw-bold">
+                            <i class="bi bi-star"></i> Milhagem
+                        </label>
+                        <input type="number" id="milhagem" class="form-control form-control-custom" placeholder="1200">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="Tipo_passagem" class="form-label fw-bold">
+                            <i class="bi bi-ticket"></i> Tipo
+                        </label>
+                        <select id="Tipo_passagem" class="form-select form-control-custom">
+                            <option value="Economica">Econômica</option>
+                            <option value="Executiva">Executiva</option>
+                            <option value="Primeira Classe">Primeira Classe</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="data" class="form-label fw-bold">
+                            <i class="bi bi-calendar"></i> Data
+                        </label>
+                        <input type="date" id="data" class="form-control form-control-custom">
+                    </div>
+                    <div class="col-md-12">
+                        <label for="hora" class="form-label fw-bold">
+                            <i class="bi bi-clock"></i> Horário
+                        </label>
+                        <input type="time" id="hora" class="form-control form-control-custom">
+                    </div>
+                    <div class="col-12 text-center mt-4">
+                        <button type="submit" class="btn btn-success btn-custom btn-lg px-5">
+                            <i class="bi bi-check-circle"></i> Adicionar Passagem
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-    <!-- Botão Cliente -->
-    <div class="card shadow-sm mb-4">
-      <a href="{{ url_for('cliente_page') }}" class="btn btn-secondary">Config Clientes</a>
+
+    <!-- Lista de Passagens -->
+    <div class="card card-custom mb-4">
+        <div class="card-body p-4">
+            <h3 class="card-title mb-4">
+                <i class="bi bi-list-ul"></i> Passagens Ativas
+            </h3>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>ID</th>
+                            <th>Rota</th>
+                            <th>Data</th>
+                            <th>Preço</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaPassagens"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-      <!-- Botão de voltar -->
-    <div class="card shadow-sm mb-4">
-      <a href="{{ url_for('homepage') }}" class="btn btn-secondary">⬅️ Voltar para Página Inicial</a>
+
+    <!-- Botões de Navegação -->
+    <div class="row g-3 mb-5">
+        <div class="col-md-6">
+            <a href="{{ url_for('cliente_page') }}" class="btn btn-info btn-custom w-100">
+                <i class="bi bi-people-fill"></i> Gerenciar Clientes
+            </a>
+        </div>
+        <div class="col-md-6">
+            <a href="{{ url_for('homepage') }}" class="btn btn-secondary btn-custom w-100">
+                <i class="bi bi-arrow-left"></i> Voltar para Home
+            </a>
+        </div>
     </div>
-     
-  </div>
-  
-  </div>
+</div>
 
-  
+<script>
+const usuarioId = 1;
 
-  <script>
-    const usuarioId = 1; // Ajuste conforme o usuário logado
-
-    // Adicionar
-    document.getElementById("formAdicionar").addEventListener("submit", e => {
-      e.preventDefault();
-      const dados = {
+document.getElementById("formAdicionar").addEventListener("submit", e => {
+    e.preventDefault();
+    const dados = {
         origem: document.getElementById("origem").value,
         destino: document.getElementById("destino").value,
         preco: parseFloat(document.getElementById("preco").value),
@@ -96,67 +144,75 @@
         data: document.getElementById("data").value,
         hora: document.getElementById("hora").value,
         usuario_id: usuarioId
-      };
+    };
 
-      fetch("/api/passagens", {
+    fetch("/api/passagens", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dados)
-      })
-      .then(res => res.json())
-      .then(data => {
+    })
+    .then(res => res.json())
+    .then(data => {
         alert(data.mensagem);
         listarPassagens();
-      });
+        document.getElementById("formAdicionar").reset();
     });
+});
 
-    // Listar
-    function listarPassagens() {
-      fetch(`/api/passagens/${usuarioId}`)
+function listarPassagens() {
+    fetch(`/api/passagens/${usuarioId}`)
         .then(res => res.json())
         .then(passagens => {
-          const lista = document.getElementById("listaPassagens");
-          lista.innerHTML = "";
-          passagens.forEach(p => {
-            const li = document.createElement("li");
-            li.className = "list-group-item d-flex justify-content-between align-items-center";
-            li.innerHTML = `
-              <span><strong>${p.origem}</strong> → ${p.destino} | R$ ${p.preco.toFixed(2)}</span>
-              <div>
-                <button class="btn btn-warning btn-sm me-2" onclick="editarPassagem(${p.id})">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="removerPassagem(${p.id})">Remover</button>
-              </div>
-            `;
-            lista.appendChild(li);
-          });
+            const lista = document.getElementById("listaPassagens");
+            lista.innerHTML = "";
+            passagens.forEach(p => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>#${p.id}</strong></td>
+                    <td><i class="bi bi-arrow-right"></i> ${p.origem} → ${p.destino}</td>
+                    <td><i class="bi bi-calendar"></i> ${p.data || 'N/A'}</td>
+                    <td><span class="badge bg-success">R$ ${p.preco.toFixed(2)}</span></td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2" onclick="editarPassagem(${p.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="removerPassagem(${p.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                lista.appendChild(tr);
+            });
         });
-    }
+}
 
-    // Editar
-    function editarPassagem(id) {
-      const novoPreco = prompt("Digite o novo preço:");
-      fetch(`/api/passagens/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ preco: parseFloat(novoPreco) })
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert(data.mensagem);
-        listarPassagens();
-      });
-    }
-
-    // Remover
-    function removerPassagem(id) {
-      fetch(`/api/passagens/${id}`, { method: "DELETE" })
+function editarPassagem(id) {
+    const novoPreco = prompt("Digite o novo preço:");
+    if (novoPreco) {
+        fetch(`/api/passagens/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ preco: parseFloat(novoPreco) })
+        })
         .then(res => res.json())
         .then(data => {
-          alert(data.mensagem);
-          listarPassagens();
+            alert(data.mensagem);
+            listarPassagens();
         });
     }
+}
 
-    listarPassagens();
-  </script>
+function removerPassagem(id) {
+    if (confirm("Deseja realmente remover esta passagem?")) {
+        fetch(`/api/passagens/${id}`, { method: "DELETE" })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.mensagem);
+                listarPassagens();
+            });
+    }
+}
+
+listarPassagens();
+</script>
 {% endblock %}

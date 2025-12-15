@@ -261,6 +261,11 @@ def editar_passagem(id):
             v["destino"] = dados.get("destino", v["destino"])
             v["data"] = dados.get("data", v.get("data"))
             v["horario"] = dados.get("horario", v.get("horario"))
+            v["n_assentos"] = dados.get("n_assentos", v.get("n_assentos"))
+            v["t_aeronave"] = dados.get("t_aeronave", v.get("t_aeronave"))
+            v["tipo_passagem"] = dados.get("tipo_passagem", v.get("tipo_passagem"))
+            v["milhagem"] = dados.get("milhagem", v.get("milhagem"))
+            
             if "preco" in dados:
                 try:
                     v["preco"] = float(dados["preco"])

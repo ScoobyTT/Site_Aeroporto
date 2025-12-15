@@ -1,150 +1,179 @@
+<!-- ====================================== -->
+<!-- CLIENTE.HTML - Gerenciar Clientes -->
+<!-- ====================================== -->
 {% extends 'base.html' %}
+
+{% block title %}Gerenciar Clientes - Passagens Online{% endblock %}
+
 {% block content %}
+<div class="container mt-4 fade-in">
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-people-fill text-info"></i> Gerenciar Clientes
+        </h1>
+        <p class="lead text-muted">Visualize e gerencie os clientes cadastrados</p>
+    </div>
 
-<!-- Navbar -->
-
-
-<div class="container mt-4">
-    <h1 class="text-center mb-4">👥 Gerenciar Clientes</h1>
-
-    <!-- Alert feedback -->
+    <!-- Alert Feedback -->
     <div id="alertBox" class="alert d-none"></div>
 
-    <!-- Lista de clientes -->
-    <div class="search-item mb-4">
-        <label>Buscar cliente</label><br>
-        <input id="campoBusca" type="text" class="form-control" placeholder="Nome,CPF ou Email">
-         <div class="card shadow-sm mt-2">
-      <button class="btn btn-primary mt-2" onclick="buscarCliente()">Buscar</button>
-
-    </div>
-    </div>
-    
-        <div class="card-body">
-            <h2 class="card-title">Clientes Registrados</h2>
-            <table class="table table-striped mt-3">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>CPF</th>
-                        <th>Nome</th>
-                        <th>Email</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="listaClientes"></tbody>
-            </table>
+    <!-- Busca de Clientes -->
+    <div class="card card-custom mb-4">
+        <div class="card-body p-4">
+            <h4 class="mb-3">
+                <i class="bi bi-search"></i> Buscar Cliente
+            </h4>
+            <div class="row g-3">
+                <div class="col-md-10">
+                    <input id="campoBusca" type="text" class="form-control form-control-custom" 
+                           placeholder="Digite o nome, CPF ou email do cliente">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary btn-custom w-100" onclick="buscarCliente()">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="card shadow-sm mb-4">
-        <a href="{{ url_for('config') }}" class="btn btn-secondary">⬅️ Voltar para Configurações</a>
-    </div>
     </div>
 
-    <!-- Botão voltar -->
-    
+    <!-- Lista de Clientes -->
+    <div class="card card-custom mb-4">
+        <div class="card-body p-4">
+            <h4 class="mb-4">
+                <i class="bi bi-list-check"></i> Clientes Registrados
+            </h4>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-info">
+                        <tr>
+                            <th>ID</th>
+                            <th>CPF</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaClientes"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão Voltar -->
+    <div class="text-center mb-5">
+        <a href="{{ url_for('config') }}" class="btn btn-secondary btn-custom px-5">
+            <i class="bi bi-arrow-left"></i> Voltar para Configurações
+        </a>
+    </div>
 </div>
 
 <script>
-    function showAlert(message, type="success") {
-        const alertBox = document.getElementById("alertBox");
-        alertBox.className = `alert alert-${type}`;
-        alertBox.textContent = message;
-        alertBox.classList.remove("d-none");
-        setTimeout(() => alertBox.classList.add("d-none"), 3000);
-    }
+function showAlert(message, type="success") {
+    const alertBox = document.getElementById("alertBox");
+    alertBox.className = `alert alert-${type} alert-custom`;
+    alertBox.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
+    alertBox.classList.remove("d-none");
+    setTimeout(() => alertBox.classList.add("d-none"), 3000);
+}
 
-    
+function listarClientes() {
+    fetch("/api/clientes")
+        .then(res => res.json())
+        .then(clientes => {
+            const tabela = document.getElementById("listaClientes");
+            tabela.innerHTML = "";
 
-    function listarClientes() {
-        fetch("/api/clientes")
-            .then(res => res.json())
-            .then(clientes => {
-                const tabela = document.getElementById("listaClientes");
-                tabela.innerHTML = "";
-
-                if (clientes.length === 0) {
-                    tabela.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">Nenhum cliente encontrado.</td>
-                        </tr>
-                    `;
-                    return;
-                }
-
-                clientes.forEach(c => {
-                    const linha = document.createElement("tr");
-                    linha.innerHTML = `
-                        <td>${c.id}</td>
-                        <td>${c.cpf}</td>
-                        <td>${c.nome}</td>
-                        <td>${c.email}</td>
-                        <td>
-                            <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${c.id})">Excluir</button>
+            if (clientes.length === 0) {
+                tabela.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                            <p class="mt-2">Nenhum cliente encontrado</p>
                         </td>
-                    `;
-                    tabela.appendChild(linha);
-                });
-            })
-            .catch(err => {
-                showAlert("Erro ao carregar clienteszzz.", "danger");
-                console.error(err);
+                    </tr>
+                `;
+                return;
+            }
+
+            clientes.forEach(c => {
+                const linha = document.createElement("tr");
+                linha.innerHTML = `
+                    <td><strong>#${c.id}</strong></td>
+                    <td><i class="bi bi-card-text"></i> ${c.cpf}</td>
+                    <td><i class="bi bi-person"></i> ${c.nome}</td>
+                    <td><i class="bi bi-envelope"></i> ${c.email}</td>
+                    <td class="text-center">
+                        <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${c.id})">
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                tabela.appendChild(linha);
             });
-    }
+        })
+        .catch(err => {
+            showAlert("Erro ao carregar clientes.", "danger");
+            console.error(err);
+        });
+}
 
-    function removerCliente(event, id) {
-        if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
+function removerCliente(event, id) {
+    if (!confirm("Tem certeza que deseja excluir este cliente?")) return;
 
-        const btn = event.target;
-        btn.disabled = true;
-        btn.textContent = "Excluindo...";
+    const btn = event.target.closest('button');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Excluindo...';
 
-        fetch(`/api/clientes/${id}`, { method: "DELETE" })
-            .then(res => res.json())
-            .then(data => {
-                showAlert(data.mensagem || data.erro, data.erro ? "danger" : "success");
-                listarClientes();
-            })
-            .catch(() => showAlert("Erro ao excluir cliente.", "danger"))
-            .finally(() => {
-                btn.disabled = false;
-                btn.textContent = "Excluir";
-            });
-    }
-    function buscarCliente() {
+    fetch(`/api/clientes/${id}`, { method: "DELETE" })
+        .then(res => res.json())
+        .then(data => {
+            showAlert(data.mensagem || data.erro, data.erro ? "danger" : "success");
+            listarClientes();
+        })
+        .catch(() => showAlert("Erro ao excluir cliente.", "danger"))
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-trash"></i> Excluir';
+        });
+}
+
+function buscarCliente() {
     const termo = document.getElementById("campoBusca").value.trim();
 
-    //  Se o campo estiver vazio → lista tudo
     if (!termo) {
         listarClientes();
         return;
     }
 
-    //  Se tiver algo → busca filtrada
     fetch(`/api/clientes/buscar?q=${encodeURIComponent(termo)}`)
         .then(res => res.json())
         .then(cliente => {
             const tabela = document.getElementById("listaClientes");
             tabela.innerHTML = "";
 
-            //  Se não encontrou nada
             if (!cliente || cliente.mensagem || cliente.erro) {
                 tabela.innerHTML = `
                     <tr>
-                        <td colspan="5" class="text-center text-muted">Nenhum cliente encontrado.</td>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="bi bi-search" style="font-size: 2rem;"></i>
+                            <p class="mt-2">Nenhum cliente encontrado</p>
+                        </td>
                     </tr>
                 `;
                 return;
             }
 
-            //  Se encontrou → mostra só ele
             const linha = document.createElement("tr");
             linha.innerHTML = `
-                <td>${cliente.id}</td>
-                <td>${cliente.cpf}</td>
-                <td>${cliente.nome}</td>
-                <td>${cliente.email}</td>
-                <td>
-                    <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${cliente.id})">Excluir</button>
+                <td><strong>#${cliente.id}</strong></td>
+                <td><i class="bi bi-card-text"></i> ${cliente.cpf}</td>
+                <td><i class="bi bi-person"></i> ${cliente.nome}</td>
+                <td><i class="bi bi-envelope"></i> ${cliente.email}</td>
+                <td class="text-center">
+                    <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${cliente.id})">
+                        <i class="bi bi-trash"></i> Excluir
+                    </button>
                 </td>
             `;
             tabela.appendChild(linha);
@@ -155,8 +184,6 @@
         });
 }
 
-
-    listarClientes();
+listarClientes();
 </script>
-
 {% endblock %}

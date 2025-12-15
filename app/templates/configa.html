@@ -61,6 +61,18 @@
             <input type="number" id="milhagem" class="form-control" placeholder="Ex: 1200">
           </div>
           <div class="col-12">
+            <label for="Tipo_passagem" class="form-label">Tipo de Passagem</label>
+            <input type="text" id="Tipo_passagem" class="form-control" placeholder="Ex: Economica">
+          </div>
+          <div class="col-12">
+            <label for="data" class="form-label">Data da Viagem</label>
+            <input type="date" id="data" class="form-control">
+          </div>
+          <div class="col-12">
+            <label for="hora" class="form-label">Hora da Viagem</label>
+            <input type="time" id="hora" class="form-control">
+          </div>
+          <div class="col-12">
             <button type="submit" class="btn btn-success">Adicionar</button>
           </div>
         </form>
@@ -102,6 +114,9 @@
         n_assentos: document.getElementById("n_assentos").value,
         t_aeronave: document.getElementById("t_aeronave").value,
         milhagem: document.getElementById("milhagem").value,
+        Tipo_passagem: document.getElementById("Tipo_passagem").value,
+        data: document.getElementById("data").value,
+        hora: document.getElementById("hora").value,
         usuario_id: usuarioId
       };
 

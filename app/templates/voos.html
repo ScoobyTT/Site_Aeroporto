@@ -31,18 +31,40 @@
 
     <h2 class="mb-4 text-center">Minhas Passagens</h2>
 
-    {% if voos|length == 0 %}
+    {% if btree_voos|length == 0 %}
         <div class="alert alert-info text-center">
             Nenhuma passagem cadastrada ainda.
         </div>
     {% else %}
 
         <div class="row">
-        {% for voo in voos %}
+        {% for voo in btree_voos %}
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm border-0 rounded-4">
 
                     <div class="card-body">
+                        <h5 class="card-subtitle mb-2 text-muted">
+                            Voo ID: {{ voo.id }}
+                        </h5>
+                        <h5 class="card-subtitle mb-3 text-muted">
+                            Passageiro: {{ voo.cliente_nome }}
+                        </h5>
+                        <h5 class="card-subtitle mb-3 text-muted">
+                            CPF: {{ voo.cliente_cpf }}
+                        </h5>
+                        <h5 class="card-subtitle mb-3 text-muted">
+                            Email: {{ voo.cliente_email }}
+                        </h5>
+                        <h5 class="card-title text-primary fw-bold">
+                            Aeronave: {{ voo.tipo_aeronave }}
+                        </h5>
+                        <h5 class="card-title text-primary fw-bold">
+                            Assento: {{ voo.assento }}
+                        </h5>
+                        <h5 class="card-title text-primary fw-bold">
+                            Milhagem: {{ voo.milhagem }} milhas
+                        </h5>
+
                         <h5 class="card-title text-primary fw-bold">
                             {{ voo.origem }} → {{ voo.destino }}
                         </h5>

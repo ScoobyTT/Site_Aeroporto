@@ -1,146 +1,44 @@
 [
   {
     "id": 1,
-    "origem": "salvadro",
-    "destino": "pero vaz",
-    "data": null,
-    "horario": null,
-    "preco": 44444444.0,
-    "usuario_id": 1
+    "origem": "Sao Paulo",
+    "destino": "Salvador",
+    "data": "2025-12-20",
+    "horario": "08:00",
+    "preco": 450.0,
+    "usuario_id": 1,
+    "n_assentos": 188,
+    "t_aeronave": "Boeing 737-800",
+    "tipo_passagem": "Econômica",
+    "milhagem": 1500,
+    "data_cadastro": "2025-12-15T16:18:51.185631"
   },
   {
     "id": 2,
-    "origem": "pero vaz",
-    "destino": "salvador",
-    "data": null,
-    "horario": null,
-    "preco": 222222.0,
-    "usuario_id": 1
+    "origem": "Salvador",
+    "destino": "Recife",
+    "data": "2025-12-20",
+    "horario": "12:00",
+    "preco": 300.0,
+    "usuario_id": 1,
+    "n_assentos": 150,
+    "t_aeronave": "Airbus A320",
+    "tipo_passagem": "Econômica",
+    "milhagem": 800,
+    "data_cadastro": "2025-12-15T16:20:24.919482"
   },
   {
     "id": 3,
-    "origem": "pernambuco",
-    "destino": "salvador",
-    "data": null,
-    "horario": null,
-    "preco": 2222222222.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 4,
-    "origem": "guarulhos",
-    "destino": "salvador",
-    "data": null,
-    "horario": null,
-    "preco": 2222222222.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 5,
-    "origem": "paulo",
-    "destino": "afonso",
-    "data": null,
-    "horario": null,
-    "preco": 55555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 6,
-    "origem": "afonso",
-    "destino": "paulo",
-    "data": null,
-    "horario": null,
-    "preco": 55555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 7,
-    "origem": "pero",
-    "destino": "vaz",
-    "data": null,
-    "horario": null,
-    "preco": 5555555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 8,
-    "origem": "sao ",
-    "destino": "bento",
-    "data": null,
-    "horario": null,
-    "preco": 55555555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 9,
-    "origem": "salvador",
-    "destino": "pernambuco",
-    "data": null,
-    "horario": null,
-    "preco": 555555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 10,
-    "origem": "perto",
-    "destino": "longe",
-    "data": null,
-    "horario": null,
-    "preco": 55555555555555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 11,
-    "origem": "pauloo",
-    "destino": "afonso",
-    "data": null,
-    "horario": null,
-    "preco": 55555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 12,
-    "origem": "alto",
-    "destino": "baixo",
-    "data": null,
-    "horario": null,
-    "preco": 555555555555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 13,
-    "origem": "baixo",
-    "destino": "alto",
-    "data": null,
-    "horario": null,
-    "preco": 555555555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 14,
-    "origem": "bala",
-    "destino": "calma",
-    "data": null,
-    "horario": null,
-    "preco": 55555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 15,
-    "origem": "senhor",
-    "destino": "destino",
-    "data": null,
-    "horario": null,
-    "preco": 5555.0,
-    "usuario_id": 1
-  },
-  {
-    "id": 16,
-    "origem": "pega",
-    "destino": "bahia",
-    "data": null,
-    "horario": null,
-    "preco": 5555.0,
-    "usuario_id": 1
+    "origem": "Sao Paulo",
+    "destino": "Recife",
+    "data": "2025-12-20",
+    "horario": "10:00",
+    "preco": 900.0,
+    "usuario_id": 1,
+    "n_assentos": 200,
+    "t_aeronave": "Boeing 777",
+    "tipo_passagem": "Executiva",
+    "milhagem": 2500,
+    "data_cadastro": "2025-12-15T16:22:01.565833"
   }
 ]

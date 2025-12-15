@@ -1,276 +1,501 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">comprar passagem</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('config')}}">ADM</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">sair</a></li>
-
-
-
-                </li>
-
-            </ul>
-        </div>
-    </div>
-</nav>
-
-
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('homepage') }}">Passagens Online</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('cadastro')}}">Cadastro</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('voos') }}">Minhas passagens</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('comprar_pass') }}">comprar passagem</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('config')}}">ADM</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">sair</a></li>
+    
+    
+    
+                    </li>
+    
+                </ul>
+            </div>
+        </div>
+    </nav mb-3>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passagens Aéreas</title>
-
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Ícones Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
+    <title>Comprar Passagens</title>
     <style>
-        body {
-            background: #2a0a62; /* roxo escuro */
-            color: white;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        .search-box {
-            background: white;
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
             border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .busca-form {
             display: flex;
             gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .busca-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .busca-form button {
+            padding: 12px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        
+        .busca-form button:hover {
+            background: #5568d3;
+        }
+        
+        .busca-form button.btn-conexao {
+            background: #764ba2;
+        }
+        
+        .busca-form button.btn-conexao:hover {
+            background: #63408a;
+        }
+        
+        .resultados {
+            margin-top: 30px;
+        }
+        
+        .secao {
+            margin-bottom: 30px;
+        }
+        
+        .secao h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .voo-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .voo-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .voo-card.conexao {
+            border-left-color: #764ba2;
+            background: #faf5ff;
+        }
+        
+        .voo-header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .rota {
+            font-size: 20px;
+            font-weight: bold;
             color: #333;
         }
-
-        .tab-btn {
-            background: #fff2;
-            border: 1px solid #ffffff44;
-            padding: 8px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            color: #fff;
-        }
-
-        .tab-btn.active {
-            background: white;
-            color: #2a0a62;
+        
+        .preco {
+            font-size: 24px;
             font-weight: bold;
+            color: #667eea;
         }
-
-        .search-item {
-            flex: 1;
+        
+        .voo-detalhes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
         }
-
-        .search-item label {
-            font-size: 13px;
-            color: #555;
-            font-weight: 600;
+        
+        .detalhe-item {
+            display: flex;
+            flex-direction: column;
         }
-
-        .search-item input {
-            width: 100%;
-            padding: 8px;
-            border: none;
-            border-bottom: 2px solid #ddd;
-            outline: none;
+        
+        .detalhe-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
-
-        .btn-buscar {
-            background: #f13535;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 30px;
+        
+        .detalhe-valor {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .conexao-info {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .voo-etapa {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .etapa-titulo {
+            font-weight: bold;
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+        
+        .sem-resultados {
+            text-align: center;
+            padding: 40px;
+            color: #999;
             font-size: 18px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #667eea;
+        }
+        
+        .btn-comprar {
+            background: #28a745;
+            color: white;
             border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        
+        .btn-comprar:hover {
+            background: #218838;
         }
     </style>
 </head>
 <body>
-
-    <div class="container mt-5">
-
-        <h3 class="mb-3">Passagens aéreas</h3>
-
-        <!-- Abas -->
-        <div class="d-flex gap-2 mb-3">
+    <div class="container">
+        <h1>🛫 Comprar Passagens</h1>
+        
+        <div class="busca-form">
+            <input type="text" id="origem" placeholder="Origem (ex: Salvador)" />
+            <input type="text" id="destino" placeholder="Destino (ex: São Paulo)" />
+            <button onclick="buscarVoosDiretos()">Buscar Voos Diretos</button>
+            <button class="btn-conexao" onclick="buscarComConexao()">Buscar com Conexões</button>
         </div>
-
-        <!-- Caixa principal -->
-        <div class="search-box">
-
-            <!-- ORIGEM -->
-            <div class="search-item">
-                <label>Origem</label><br>
-                <input id="input-origem" type="text" placeholder="Insira sua cidade de origem">
-            </div>
-
-
-            <!-- DESTINO -->
-            <div class="search-item">
-                <label>Destino</label><br>
-                <input id="input-destino" type="text" placeholder="Insira seu destino">
-            </div>
-
-            <!-- IDA -->
-            <div class="search-item">
-                <label>Ida</label><br>
-                <input type="date">
-            </div>
-
-            <!-- VOLTA -->
-            <div class="search-item">
-                <label>Volta</label><br>
-                <input type="date">
-            </div>
-
-            <div class="campo-selecao">
-                <label class="titulo">Classe</label>
-            
-                <div class="select-box">
-                    <select>
-                        <option value="economica">Econômica</option>
-                        <option value="premium">Premium Economy</option>
-                        <option value="executiva">Executiva</option>
-                        <option value="primeira">Primeira Classe</option>
-                    </select>
-                    <span class="seta">▼</span>
-                </div>
-            </div>
-            
-            <style>
-            .campo-selecao {
-                display: flex;
-                flex-direction: column;
-                width: 220px;
-                font-family: Arial, sans-serif;
-            }
-            
-            .campo-selecao .titulo {
-                font-size: 16px;
-                margin-bottom: 6px;
-            }
-            
-            .select-box {
-                position: relative;
-                width: 100%;
-            }
-            
-            .select-box select {
-                width: 100%;
-                padding: 10px 40px 10px 10px;
-                border: 2px solid #ccc;
-                border-radius: 8px;
-                font-size: 16px;
-                appearance: none;
-                background-color: #fff;
-                cursor: pointer;
-            }
-            
-            .select-box .seta {
-                position: absolute;
-                right: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 14px;
-                pointer-events: none;
-            }
-            </style>
-            
-
-            <!-- BOTÃO -->
-            <button class="btn-buscar">
-                <i class="bi bi-search"></i> Buscar
-            </button>
-            <!-- Resultados -->
-        </div>
-        <div id="listaResultados" class="mt-4"></div>
-
-
+        
+        <div id="resultados" class="resultados"></div>
     </div>
 
+    <script>
+        function buscarVoosDiretos() {
+            const origem = document.getElementById('origem').value.trim();
+            const destino = document.getElementById('destino').value.trim();
+            
+            if (!origem || !destino) {
+                alert('Por favor, preencha origem e destino!');
+                return;
+            }
+            
+            const resultadosDiv = document.getElementById('resultados');
+            resultadosDiv.innerHTML = '<div class="loading">🔍 Buscando voos diretos...</div>';
+            
+            fetch(`/api/voos?origem=${encodeURIComponent(origem)}&destino=${encodeURIComponent(destino)}`)
+                .then(res => res.json())
+                .then(voos => {
+                    if (voos.length === 0) {
+                        resultadosDiv.innerHTML = '<div class="sem-resultados">❌ Nenhum voo direto encontrado</div>';
+                    } else {
+                        exibirVoosDiretos(voos);
+                    }
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                    resultadosDiv.innerHTML = '<div class="sem-resultados">❌ Erro ao buscar voos</div>';
+                });
+        }
+        
+        function buscarComConexao() {
+            const origem = document.getElementById('origem').value.trim();
+            const destino = document.getElementById('destino').value.trim();
+            
+            if (!origem || !destino) {
+                alert('Por favor, preencha origem e destino!');
+                return;
+            }
+            
+            const resultadosDiv = document.getElementById('resultados');
+            resultadosDiv.innerHTML = '<div class="loading">🔍 Buscando voos (diretos + conexões)...</div>';
+            
+            fetch(`/api/voos/com-conexao?origem=${encodeURIComponent(origem)}&destino=${encodeURIComponent(destino)}`)
+                .then(res => res.json())
+                .then(data => {
+                    exibirResultadosCompletos(data);
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                    resultadosDiv.innerHTML = '<div class="sem-resultados">❌ Erro ao buscar voos</div>';
+                });
+        }
+        
+        function exibirVoosDiretos(voos) {
+            const resultadosDiv = document.getElementById('resultados');
+            
+            let html = '<div class="secao">';
+            html += `<h2>✈️ Voos Diretos (${voos.length})</h2>`;
+            
+            voos.forEach(voo => {
+                html += criarCardVoo(voo);
+            });
+            
+            html += '</div>';
+            resultadosDiv.innerHTML = html;
+        }
+        
+        function exibirResultadosCompletos(data) {
+            const resultadosDiv = document.getElementById('resultados');
+            let html = '';
+            
+            // Voos Diretos
+            if (data.diretos && data.diretos.length > 0) {
+                html += '<div class="secao">';
+                html += `<h2>✈️ Voos Diretos (${data.diretos.length})</h2>`;
+                data.diretos.forEach(voo => {
+                    html += criarCardVoo(voo);
+                });
+                html += '</div>';
+            }
+            
+            // Voos com Conexão
+            if (data.com_1_conexao && data.com_1_conexao.length > 0) {
+                html += '<div class="secao">';
+                html += `<h2>🔄 Voos com 1 Conexão (${data.com_1_conexao.length})</h2>`;
+                data.com_1_conexao.forEach(conexao => {
+                    html += criarCardConexao(conexao);
+                });
+                html += '</div>';
+            }
+            
+            // Sem resultados
+            if ((!data.diretos || data.diretos.length === 0) && 
+                (!data.com_1_conexao || data.com_1_conexao.length === 0)) {
+                html = '<div class="sem-resultados">❌ Nenhum voo encontrado para esta rota</div>';
+            }
+            
+            resultadosDiv.innerHTML = html;
+        }
+        
+        function criarCardVoo(voo) {
+            return `
+                <div class="voo-card">
+                    <div class="voo-header">
+                        <div class="rota">${voo.origem} → ${voo.destino}</div>
+                        <div class="preco">R$ ${parseFloat(voo.preco).toFixed(2)}</div>
+                    </div>
+                    
+                    <div class="voo-detalhes">
+                        <div class="detalhe-item">
+                            <span class="detalhe-label"> ID do Voo</span>
+                            <span class="detalhe-valor">${voo.id}</span>
+                        </div>
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">📅 Data</span>
+                            <span class="detalhe-valor">${voo.data || 'Não informada'}</span>
+                        </div>
+                        
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">🕐 Horário</span>
+                            <span class="detalhe-valor">${voo.horario || 'Não informado'}</span>
+                        </div>
+                        
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">💺 Assentos</span>
+                            <span class="detalhe-valor">${voo.n_assentos || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">✈️ Aeronave</span>
+                            <span class="detalhe-valor">${voo.t_aeronave || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">🎫 Tipo</span>
+                            <span class="detalhe-valor">${voo.tipo_passagem || 'N/A'}</span>
+                        </div>
+                        
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">🏆 Milhagem</span>
+                            <span class="detalhe-valor">${voo.milhagem || 0} milhas</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-comprar" onclick="comprarPassagem(${voo.id})">Comprar Passagem</button>
+                </div>
+            `;
+        }
+        
+        function criarCardConexao(conexao) {
+            const voo1 = conexao.voo1;
+            const voo2 = conexao.voo2;
+            
+            return `
+                <div class="voo-card conexao">
+                    <div class="voo-header">
+                        <div class="rota">${voo1.origem} → ${conexao.conexao_em} → ${voo2.destino}</div>
+                        <div class="preco">R$ ${conexao.preco_total.toFixed(2)}</div>
+                    </div>
+                    
+                    <div class="conexao-info">
+                        🔄 Conexão em: ${conexao.conexao_em}
+                    </div>
+                    
+                    <!-- VOO 1 -->
+                    <div class="voo-etapa">
+                        <div class="etapa-titulo">1º Trecho: ${voo1.origem} → ${voo1.destino}</div>
+                        <div class="voo-detalhes">
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">📅 Data</span>
+                                <span class="detalhe-valor">${voo1.data || 'N/A'}</span>
+                            </div>
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">🕐 Horário</span>
+                                <span class="detalhe-valor">${voo1.horario || 'N/A'}</span>
+                            </div>
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">💰 Preço</span>
+                                <span class="detalhe-valor">R$ ${parseFloat(voo1.preco).toFixed(2)}</span>
+                            </div>
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">✈️ Aeronave</span>
+                                <span class="detalhe-valor">${voo1.t_aeronave || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- VOO 2 -->
+                    <div class="voo-etapa">
+                        <div class="etapa-titulo">2º Trecho: ${voo2.origem} → ${voo2.destino}</div>
+                        <div class="voo-detalhes">
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">📅 Data</span>
+                                <span class="detalhe-valor">${voo2.data || 'N/A'}</span>
+                            </div>
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">🕐 Horário</span>
+                                <span class="detalhe-valor">${voo2.horario || 'N/A'}</span>
+                            </div>
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">💰 Preço</span>
+                                <span class="detalhe-valor">R$ ${parseFloat(voo2.preco).toFixed(2)}</span>
+                            </div>
+                            <div class="detalhe-item">
+                                <span class="detalhe-label">✈️ Aeronave</span>
+                                <span class="detalhe-valor">${voo2.t_aeronave || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-comprar" onclick="comprarConexao(${voo1.id}, ${voo2.id})">Comprar Passagem com Conexão</button>
+                </div>
+            `;
+        }
+        function comprarPassagem(vooId) {
+            // Pega o usuário da sessão
+            fetch('/api/usuario-logado')
+                .then(res => res.json())
+                .then(usuario => {
+                    if (!usuario || !usuario.id) {
+                        alert('Você precisa fazer login para comprar passagens!');
+                        window.location.href = '/login';
+                        return;
+                    }
+                    
+                    // Agora sim, compra a passagem
+                    return fetch("/api/comprar", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            usuario_id: usuario.id,
+                            voo_id: vooId
+                        })
+                    });
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.mensagem || "Compra realizada com sucesso!");
+                    window.location.href = '/voos/';  // Redireciona para "Minhas Passagens"
+                })
+                .catch(err => {
+                    alert("Erro ao comprar passagem.");
+                    console.error(err);
+                });
+}
+        
+        
+        
+     
+        
+        function comprarConexao(voo1Id, voo2Id) {
+            alert(`Comprando voos:\n- Voo 1 (ID: ${voo1Id})\n- Voo 2 (ID: ${voo2Id})\n\n()`);
+            // TODO: Implementar lógica de compra com conexão
+        }
+    </script>
 </body>
 </html>
-<script>
-    const usuarioId = 1; // Usuário logado
-
-    // Clique do botão BUSCAR
-    document.querySelector(".btn-buscar").addEventListener("click", () => {
-        const origem = document.getElementById("input-origem").value.trim();
-        const destino = document.getElementById("input-destino").value.trim();
-
-        if (!origem || !destino) {
-            alert("Preencha origem e destino!");
-            return;
-        }
-
-        buscarVoos(origem, destino);
-    });
-
-    // Buscar voos filtrados
-    function buscarVoos(origem, destino) {
-        fetch(`/api/voos?origem=${origem}&destino=${destino}`)
-            .then(res => res.json())
-            .then(voos => {
-                const lista = document.getElementById("listaResultados");
-                lista.innerHTML = "";
-
-                if (voos.length === 0) {
-                    lista.innerHTML = "<p>Nenhum voo encontrado.</p>";
-                    return;
-                }
-
-                voos.forEach(v => {
-                    const div = document.createElement("div");
-                    div.className = "card p-3 mt-2 text-dark bg-light";
-
-                    div.innerHTML = `                        
-                        <h5>${v.origem} → ${v.destino}</h5>
-                        <p>Código do voo: ${v.id}</p>
-                        <p>Assentos disponíveis: ${v.n_assentos}</p>
-                        <p>Aeronave: ${v.t_aeronave}</p>
-                        <p>Milhagem: ${v.milhagem} km</p>
-                        
-                        <p><strong>Preço: R$ ${v.preco.toFixed(2)}</strong></p>
-                        <button class="btn btn-success"
-                                onclick="comprarPassagem(${v.id})">
-                            Comprar
-                        </button>
-                    `;
-
-                    lista.appendChild(div);
-                });
-            });
-    }
-
-    // Comprar passagem
-    function comprarPassagem(vooId) {
-        fetch("/api/comprar", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                usuario_id: usuarioId,
-                voo_id: vooId
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.mensagem || "Compra realizada!");
-        });
-    }
-</script>
-
-</section>{% endblock %}

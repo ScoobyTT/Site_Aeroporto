@@ -106,8 +106,21 @@ def usuario_logado():
 
     return next((u for u in usuarios if u["email"] == email), None)
 
+@app.route('/api/usuario-logado', methods=['GET'])
+def api_usuario_logado():
+    """Retorna dados do usuário logado via API"""
+    usuario = usuario_logado()
+    
+    if not usuario:
+        return jsonify({"erro": "Usuário não está logado"}), 401
+    
+    return jsonify({
+        "id": usuario["id"],
+        "nome": usuario["nome"],
+        "email": usuario["email"]
+    }), 200
 
-# Página de voos do usuário: mantém rota
+
 @app.route("/voos/")
 def voos():
     usuario = usuario_logado()
@@ -117,15 +130,47 @@ def voos():
 
     usuario_id = usuario["id"]
 
-    usuarios = carregar_json(USUARIOS_FILE)
-    usuario = next((u for u in usuarios if u["id"] == usuario_id), None)
-    if not usuario:
-        return jsonify({"erro": "Usuário não encontrado"}), 404
-
-    voos_info = [v for v in carregar_json(VOOS_FILE) if v.get("usuario_id") == usuario_id]
-    return render_template("voos.html", usuario=usuario, voos=voos_info)
-
-
+    # 1. Busca as compras do usuário
+    compras = carregar_json(COMPRAS_FILE)
+    voos_comprados_ids = [
+        c["voo_id"] for c in compras 
+        if c.get("usuario_id") == usuario_id
+    ]
+    
+    # 2. Coleta todos os voos da árvore B
+    todos_voos = []
+    def percorrer(node):
+        if node is None:
+            return
+        for k, v in node.keys:
+            todos_voos.append(v)
+        for child in node.children:
+            percorrer(child)
+    
+    percorrer(trees.btree_voos.root)
+    
+    # 3. Filtra apenas os voos que o usuário comprou
+    voos_comprados = [
+        v for v in todos_voos 
+        if v["id"] in voos_comprados_ids
+    ]
+    
+    # 4. Enriquece os voos com dados do usuário
+    for voo in voos_comprados:
+        voo['cliente_nome'] = usuario.get('nome', 'N/A')
+        voo['cliente_cpf'] = usuario.get('cpf', 'N/A')
+        voo['cliente_email'] = usuario.get('email', 'N/A')
+        
+        # Adiciona campos padrão se não existirem
+        voo.setdefault('tipo_aeronave', voo.get('t_aeronave', 'Boeing 737'))
+        voo.setdefault('assento', 'A definir')
+        voo.setdefault('milhagem', voo.get('milhagem', 0))
+        voo.setdefault('data_cadastro', voo.get('data_cadastro', 'N/A'))
+    
+    print(f"🛒 Compras do usuário {usuario_id}: {voos_comprados_ids}")
+    print(f"✈️ Voos comprados: {len(voos_comprados)}")
+    
+    return render_template("voos.html", usuario=usuario, btree_voos=voos_comprados)
 
 
 # Cadastro de voo: mantém rota e método
@@ -172,7 +217,14 @@ def adicionar_passagem():
             "data": dados.get("data"),
             "horario": dados.get("horario"),
             "preco": float(dados.get("preco", 0)),
-            "usuario_id": int(dados.get("usuario_id", 0))
+            "usuario_id": int(dados.get("usuario_id", 0)),
+            "n_assentos": int(dados.get("n_assentos", 100)),
+            "t_aeronave": dados.get("t_aeronave", ""),
+            "tipo_passagem": dados.get("tipo_passagem", ""),
+            "milhagem": int(dados.get("milhagem", 0)),
+            "data": dados.get("data", ""),
+            "horario": dados.get("horario", ""),
+            "data_cadastro": datetime.utcnow().isoformat()
         }
     except (TypeError, ValueError):
         return jsonify({"erro": "Tipos inválidos em preço/usuario_id"}), 400
@@ -281,25 +333,31 @@ def comprar_pass():
 # -------------------------
 COMPRAS_FILE = "compras.json"
 
-
 @app.route('/api/comprar', methods=['POST'])
 def comprar_passagem():
     dados = request.get_json()
+    print(f" Dados recebidos: {dados}")  # DEBUG
+    
     if not dados:
         return jsonify({"erro": "JSON de entrada é obrigatório"}), 400
 
     try:
         voo_id = int(dados.get("voo_id"))
         usuario_id = int(dados.get("usuario_id"))
-    except (TypeError, ValueError):
+        print(f" voo_id: {voo_id}, usuario_id: {usuario_id}")  # DEBUG
+    except (TypeError, ValueError) as e:
+        print(f" Erro ao converter IDs: {e}")  # DEBUG
         return jsonify({"erro": "voo_id/usuario_id inválidos"}), 400
 
     # valida se o voo existe
     voos = carregar_json(VOOS_FILE)
     if not any(v.get("id") == voo_id for v in voos):
+        print(f" Voo {voo_id} não encontrado")  # DEBUG
         return jsonify({"erro": "Voo não encontrado"}), 404
 
     compras = carregar_json(COMPRAS_FILE)
+    print(f" Compras antes: {len(compras)}")  # DEBUG
+    
     nova_compra = {
         "id": proximo_id(compras),
         "voo_id": voo_id,
@@ -308,6 +366,9 @@ def comprar_passagem():
     }
     compras.append(nova_compra)
     salvar_json(COMPRAS_FILE, compras)
+    
+    print(f" Nova compra: {nova_compra}")  # DEBUG
+    print(f" Compras depois: {len(compras)}")  # DEBUG
 
     # opcional: marcar voo como comprado
     for v in voos:
@@ -320,7 +381,7 @@ def comprar_passagem():
         "mensagem": "Compra registrada com sucesso!",
         "compra_id": nova_compra["id"]
     }), 201
-
+    
 @app.route('/api/compras/<int:usuario_id>', methods=['GET'])
 def listar_compras(usuario_id):
     compras = carregar_json(COMPRAS_FILE)
@@ -493,3 +554,71 @@ def remover_cliente(id):
     salvar_json(USUARIOS_FILE, clientes)
     return jsonify({"mensagem": "Cliente removido com sucesso!"}), 200
 
+# ====================
+# ROTAS DE GRAFO (ADICIONAR NO FINAL DO views.py)
+# ====================
+
+from app.grafo import Grafo
+
+@app.route("/api/voos/com-conexao", methods=["GET"])
+def buscar_voos_com_conexao():
+    """
+    Busca voos diretos + voos com 1 conexão
+    Parâmetros: ?origem=xxx&destino=yyy
+    """
+    origem = request.args.get("origem", "")
+    destino = request.args.get("destino", "")
+    
+    if not origem or not destino:
+        return jsonify({"erro": "Parâmetros origem e destino são obrigatórios"}), 400
+    
+    # Carrega todos os voos da árvore B
+    voos = []
+    def percorrer(node):
+        if node is None:
+            return
+        for k, v in node.keys:
+            voos.append(v)
+        for child in node.children:
+            percorrer(child)
+    
+    percorrer(trees.btree_voos.root)
+    
+    # Cria e popula o grafo
+    grafo = Grafo()
+    grafo.carregar_voos(voos)
+    
+    # Busca todas as rotas
+    resultados = grafo.buscar_todas_rotas(origem, destino)
+    
+    print(f"\n🔍 BUSCA COM GRAFO: {origem} → {destino}")
+    print(f"   Diretos: {resultados['total_diretos']}")
+    print(f"   Com conexão: {resultados['total_com_conexao']}")
+    
+    return jsonify(resultados), 200
+
+
+@app.route("/api/grafo/estatisticas", methods=["GET"])
+def estatisticas_grafo():
+    """
+    Retorna estatísticas do grafo de voos
+    """
+    # Carrega todos os voos
+    voos = []
+    def percorrer(node):
+        if node is None:
+            return
+        for k, v in node.keys:
+            voos.append(v)
+        for child in node.children:
+            percorrer(child)
+    
+    percorrer(trees.btree_voos.root)
+    
+    # Cria grafo e gera estatísticas
+    grafo = Grafo()
+    grafo.carregar_voos(voos)
+    stats = grafo.obter_estatisticas()
+    stats['cidades'] = grafo.obter_cidades()
+    
+    return jsonify(stats), 200

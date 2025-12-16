@@ -43,7 +43,7 @@
             <h4 class="mb-4">
                 <i class="bi bi-list-check"></i> Clientes Registrados
             </h4>
-            <div class="table-responsive">
+            <div class="table-responsive" style="min-height: 200px;">
                 <table class="table table-hover">
                     <thead class="table-info">
                         <tr>
@@ -148,11 +148,12 @@ function buscarCliente() {
 
     fetch(`/api/clientes/buscar?q=${encodeURIComponent(termo)}`)
         .then(res => res.json())
-        .then(cliente => {
+        .then(data => {
             const tabela = document.getElementById("listaClientes");
             tabela.innerHTML = "";
 
-            if (!cliente || cliente.mensagem || cliente.erro) {
+            // Verifica se retornou erro ou mensagem
+            if (data.mensagem || data.erro) {
                 tabela.innerHTML = `
                     <tr>
                         <td colspan="5" class="text-center text-muted py-4">
@@ -164,19 +165,24 @@ function buscarCliente() {
                 return;
             }
 
-            const linha = document.createElement("tr");
-            linha.innerHTML = `
-                <td><strong>#${cliente.id}</strong></td>
-                <td><i class="bi bi-card-text"></i> ${cliente.cpf}</td>
-                <td><i class="bi bi-person"></i> ${cliente.nome}</td>
-                <td><i class="bi bi-envelope"></i> ${cliente.email}</td>
-                <td class="text-center">
-                    <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${cliente.id})">
-                        <i class="bi bi-trash"></i> Excluir
-                    </button>
-                </td>
-            `;
-            tabela.appendChild(linha);
+            // Se retornou array (múltiplos)
+            const clientes = Array.isArray(data) ? data : [data];
+
+            clientes.forEach(cliente => {
+                const linha = document.createElement("tr");
+                linha.innerHTML = `
+                    <td><strong>#${cliente.id}</strong></td>
+                    <td><i class="bi bi-card-text"></i> ${cliente.cpf}</td>
+                    <td><i class="bi bi-person"></i> ${cliente.nome}</td>
+                    <td><i class="bi bi-envelope"></i> ${cliente.email}</td>
+                    <td class="text-center">
+                        <button class="btn btn-danger btn-sm" onclick="removerCliente(event, ${cliente.id})">
+                            <i class="bi bi-trash"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                tabela.appendChild(linha);
+            });
         })
         .catch(err => {
             showAlert("Erro ao buscar cliente.", "danger");

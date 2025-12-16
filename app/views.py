@@ -627,3 +627,48 @@ def estatisticas_grafo():
     stats['cidades'] = grafo.obter_cidades()
     
     return jsonify(stats), 200
+
+
+@app.route("/api/clientes/buscar", methods=["GET"])
+def buscar_cliente_por_termo():
+    """
+    Busca cliente por termo (nome, email ou CPF) - busca parcial
+    Parâmetro: ?q=xxx
+    """
+    termo = request.args.get("q", "").lower().strip()
+    
+    if not termo:
+        return jsonify({"erro": "Parâmetro 'q' é obrigatório"}), 400
+    
+    print(f"\n🔍 BUSCA CLIENTE: termo='{termo}'")
+    
+    # Busca parcial na árvore
+    resultados = []
+    def percorrer(node):
+        if node is None:
+            return
+        for k, v in node.keys:
+            nome_match = termo in v.get("nome", "").lower()
+            email_match = termo in v.get("email", "").lower()
+            cpf_limpo = v.get("cpf", "").replace(".", "").replace("-", "").replace(" ", "")
+            termo_limpo = termo.replace(".", "").replace("-", "").replace(" ", "")
+            cpf_match = termo_limpo in cpf_limpo
+            
+            if nome_match or email_match or cpf_match:
+                resultados.append(v)
+        
+        for child in node.children:
+            percorrer(child)
+    
+    percorrer(trees.arvore_nome.root)
+    
+    print(f"📊 Total encontrados: {len(resultados)}\n")
+    
+    # Se encontrou múltiplos, retorna array
+    # Se encontrou 1, retorna objeto (pra manter compatibilidade)
+    if len(resultados) == 0:
+        return jsonify({"mensagem": "Nenhum cliente encontrado"}), 404
+    elif len(resultados) == 1:
+        return jsonify(resultados[0]), 200
+    else:
+        return jsonify(resultados), 200

@@ -62,7 +62,9 @@ def login():
     usuario = usuario_logado()
     if usuario:
         if usuario["email"] == ADMIN_EMAIL:
-            return redirect(url_for("config"))
+            flash("Você já está logado como administrador.", "info")
+            return render_template("index.html")
+        flash("Você já está logado.", "info")
         return redirect(url_for("homepage"))
     
     form = LoginForm()

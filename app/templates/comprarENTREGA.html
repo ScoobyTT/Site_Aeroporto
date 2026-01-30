@@ -1,0 +1,461 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    body {
+        background: #2a0a62;
+        color: white;
+    }
+
+    .search-box {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+        color: #333;
+    }
+
+    .search-item {
+        flex: 1 1 180px;
+        min-width: 180px;
+    }
+
+    .search-item label {
+        font-size: 13px;
+        color: #555;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .search-item input,
+    .search-item select {
+        width: 100%;
+        padding: 8px;
+        border: none;
+        border-bottom: 2px solid #ddd;
+        outline: none;
+        background: white;
+    }
+
+    .campo-selecao {
+        flex: 1 1 180px;
+        min-width: 180px;
+    }
+
+    .campo-selecao .titulo {
+        font-size: 13px;
+        color: #555;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .select-box {
+        position: relative;
+    }
+
+    .select-box select {
+        width: 100%;
+        padding: 10px 40px 10px 10px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        appearance: none;
+        background-color: #fff;
+        cursor: pointer;
+    }
+
+    .select-box .seta {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 14px;
+        pointer-events: none;
+    }
+
+    .btn-buscar {
+        background: #f13535;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-size: 18px;
+        border: none;
+        flex: 1 1 150px;
+        min-width: 150px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-buscar:hover {
+        background: #d12828;
+    }
+
+    .card-voo {
+        border-left: 5px solid #2a0a62;
+        background: white;
+        color: #333;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .card-voo h5 {
+        color: #2a0a62;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .badge-escala {
+        background: #ffc107;
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+
+    .rota-detalhes {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+        font-size: 14px;
+    }
+
+    .rota-detalhes div {
+        padding: 5px 0;
+    }
+</style>
+
+<div class="container mt-5">
+    <h3 class="mb-3">Passagens aéreas</h3>
+
+    <!-- Caixa principal -->
+    <div class="search-box">
+        <div class="search-item">
+            <label>Origem</label>
+            <select id="input-origem">
+                <option value="">Selecione a origem</option>
+                <option value="Salvador">Salvador</option>
+                <option value="Aracaju">Aracaju</option>
+                <option value="Maceió">Maceió</option>
+                <option value="Recife">Recife</option>
+                <option value="João Pessoa">João Pessoa</option>
+                <option value="Natal">Natal</option>
+                <option value="Fortaleza">Fortaleza</option>
+                <option value="Teresina">Teresina</option>
+                <option value="São Luís">São Luís</option>
+            </select>
+        </div>
+
+        <div class="search-item">
+            <label>Destino</label>
+            <select id="input-destino">
+                <option value="">Selecione o destino</option>
+                <option value="Salvador">Salvador</option>
+                <option value="Aracaju">Aracaju</option>
+                <option value="Maceió">Maceió</option>
+                <option value="Recife">Recife</option>
+                <option value="João Pessoa">João Pessoa</option>
+                <option value="Natal">Natal</option>
+                <option value="Fortaleza">Fortaleza</option>
+                <option value="Teresina">Teresina</option>
+                <option value="São Luís">São Luís</option>
+            </select>
+        </div>
+
+        <div class="search-item">
+            <label>Ida</label>
+            <input id="input-ida" type="date">
+        </div>
+
+        <div class="search-item">
+            <label>Volta</label>
+            <input id="input-volta" type="date">
+        </div>
+
+        <div class="campo-selecao">
+            <label class="titulo">Classe</label>
+            <div class="select-box">
+                <select id="input-classe">
+                    <option value="economica">Econômica</option>
+                    <option value="premium">Premium Economy</option>
+                    <option value="executiva">Executiva</option>
+                    <option value="primeira">Primeira Classe</option>
+                </select>
+                <span class="seta">▼</span>
+            </div>
+        </div>
+
+        <button class="btn-buscar" id="btnBuscar">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+    </div>
+
+    <div id="listaResultados" class="mt-4"></div>
+</div>
+
+<script>
+    const usuarioId = 1;
+
+    // Grafo de rotas baseado no igraph (distâncias reais em km)
+    const grafo = {
+        vertices: ["Salvador", "Aracaju", "Maceió", "Recife", "João Pessoa", 
+                  "Natal", "Fortaleza", "Teresina", "São Luís"],
+        arestas: [
+            { origem: "Salvador", destino: "Aracaju", peso: 323, preco: 261.50, t_aeronave: "Airbus A320", milhagem: 388 },
+            { origem: "Aracaju", destino: "Maceió", peso: 276, preco: 238.00, t_aeronave: "Airbus A320", milhagem: 331 },
+            { origem: "Maceió", destino: "Recife", peso: 255, preco: 227.50, t_aeronave: "Airbus A320", milhagem: 306 },
+            { origem: "Recife", destino: "João Pessoa", peso: 117, preco: 158.50, t_aeronave: "Airbus A320", milhagem: 140 },
+            { origem: "João Pessoa", destino: "Natal", peso: 175, preco: 187.50, t_aeronave: "Airbus A320", milhagem: 210 },
+            { origem: "Natal", destino: "Fortaleza", peso: 524, preco: 362.00, t_aeronave: "Airbus A320", milhagem: 629 },
+            { origem: "Fortaleza", destino: "Teresina", peso: 511, preco: 355.50, t_aeronave: "Airbus A320", milhagem: 613 },
+            { origem: "Teresina", destino: "São Luís", peso: 440, preco: 320.00, t_aeronave: "Airbus A320", milhagem: 528 },
+            { origem: "São Luís", destino: "Salvador", peso: 1330, preco: 765.00, t_aeronave: "Airbus A320", milhagem: 1596 }
+        ]
+    };
+
+    // Algoritmo de Dijkstra para encontrar menor caminho
+    function encontrarMenorCaminho(origem, destino) {
+        const distancias = {};
+        const predecessores = {};
+        const precos = {};
+        const visitados = new Set();
+        
+        grafo.vertices.forEach(v => {
+            distancias[v] = Infinity;
+            precos[v] = Infinity;
+        });
+        
+        distancias[origem] = 0;
+        precos[origem] = 0;
+
+        while (visitados.size < grafo.vertices.length) {
+            let minVertice = null;
+            let minDist = Infinity;
+            
+            for (let v of grafo.vertices) {
+                if (!visitados.has(v) && distancias[v] < minDist) {
+                    minDist = distancias[v];
+                    minVertice = v;
+                }
+            }
+            
+            if (minVertice === null || minVertice === destino) break;
+            
+            visitados.add(minVertice);
+            
+            grafo.arestas.forEach(aresta => {
+                if (aresta.origem === minVertice) {
+                    const novaDist = distancias[minVertice] + aresta.peso;
+                    const novoPreco = precos[minVertice] + aresta.preco;
+                    
+                    if (novaDist < distancias[aresta.destino]) {
+                        distancias[aresta.destino] = novaDist;
+                        precos[aresta.destino] = novoPreco;
+                        predecessores[aresta.destino] = minVertice;
+                    }
+                }
+            });
+        }
+        
+        // Reconstruir caminho
+        const caminho = [];
+        let atual = destino;
+        
+        while (atual) {
+            caminho.unshift(atual);
+            atual = predecessores[atual];
+        }
+        
+        if (caminho[0] !== origem) {
+            return null;
+        }
+        
+        // Coletar informações de cada trecho
+        const trechos = [];
+        for (let i = 0; i < caminho.length - 1; i++) {
+            const arestaInfo = grafo.arestas.find(a => 
+                a.origem === caminho[i] && a.destino === caminho[i + 1]
+            );
+            
+            if (arestaInfo) {
+                trechos.push({
+                    origem: caminho[i],
+                    destino: caminho[i + 1],
+                    distancia: arestaInfo.peso,
+                    preco: arestaInfo.preco,
+                    aeronave: arestaInfo.t_aeronave,
+                    milhagem: arestaInfo.milhagem,
+                    horario: `${8 + (i * 2)}:00` // Horários espaçados
+                });
+            }
+        }
+        
+        return {
+            caminho: caminho,
+            distancia: distancias[destino],
+            preco: precos[destino],
+            trechos: trechos
+        };
+    }
+
+    // Event listener do botão buscar
+    document.getElementById("btnBuscar").addEventListener("click", () => {
+        const origem = document.getElementById("input-origem").value;
+        const destino = document.getElementById("input-destino").value;
+        const dataIda = document.getElementById("input-ida").value;
+        const dataVolta = document.getElementById("input-volta").value;
+        const classe = document.getElementById("input-classe").value;
+
+        if (!origem || !destino) {
+            alert("Por favor, selecione origem e destino!");
+            return;
+        }
+
+        if (origem === destino) {
+            alert("Origem e destino não podem ser iguais!");
+            return;
+        }
+
+        buscarVoos(origem, destino, dataIda, dataVolta, classe);
+    });
+
+    function buscarVoos(origem, destino, dataIda, dataVolta, classe) {
+        const resultado = encontrarMenorCaminho(origem, destino);
+        const lista = document.getElementById("listaResultados");
+        lista.innerHTML = "";
+
+        if (!resultado) {
+            lista.innerHTML = '<div class="card-voo"><p>Nenhuma rota encontrada entre as cidades selecionadas.</p></div>';
+            return;
+        }
+
+        const multiplicadorClasse = {
+            'economica': 1,
+            'premium': 1.5,
+            'executiva': 2,
+            'primeira': 3
+        };
+
+        const precoFinal = resultado.preco * multiplicadorClasse[classe];
+        const numEscalas = resultado.caminho.length - 2;
+
+        const div = document.createElement("div");
+        div.className = "card card-voo text-dark bg-light";
+
+        // Montar detalhes de cada trecho
+        let trechosHTML = '<div class="rota-detalhes"><strong>Detalhes dos trechos:</strong>';
+        for (let i = 0; i < resultado.trechos.length; i++) {
+            const trecho = resultado.trechos[i];
+            trechosHTML += `
+                <div style="border-left: 3px solid #2a0a62; padding-left: 10px; margin: 10px 0;">
+                    <div><i class="bi bi-airplane-fill"></i> <strong>Trecho ${i + 1}:</strong> ${trecho.origem} → ${trecho.destino}</div>
+                    <div style="font-size: 13px; color: #666; margin-left: 20px;">
+                        <div><i class="bi bi-speedometer2"></i> Distância: ${trecho.distancia} km</div>
+                        <div><i class="bi bi-cash"></i> Preço base: R$ ${trecho.preco.toFixed(2)}</div>
+                        <div><i class="bi bi-airplane"></i> Aeronave: ${trecho.aeronave}</div>
+                        <div><i class="bi bi-star-fill"></i> Milhagem: ${trecho.milhagem} pontos</div>
+                        <div><i class="bi bi-clock"></i> Horário estimado: ${trecho.horario}</div>
+                    </div>
+                </div>
+            `;
+        }
+        trechosHTML += '</div>';
+
+        // Resumo da viagem
+        const classeNome = classe.charAt(0).toUpperCase() + classe.slice(1).replace('_', ' ');
+        const tipoPassagem = dataVolta ? "Ida e Volta" : "Somente Ida";
+        const milhagemTotal = resultado.trechos.reduce((sum, t) => sum + t.milhagem, 0);
+        const milhagemFinal = Math.round(milhagemTotal * multiplicadorClasse[classe]);
+
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 15px;">
+                <div style="flex: 1; min-width: 300px;">
+                    <h5>
+                        <i class="bi bi-geo-alt-fill"></i> ${origem} → ${destino}
+                        ${numEscalas > 0 ? `<span class="badge-escala">${numEscalas} escala${numEscalas > 1 ? 's' : ''}</span>` : '<span class="badge bg-success">Voo direto</span>'}
+                    </h5>
+                    
+                    <div style="background: #e7f3ff; padding: 10px; border-radius: 8px; margin: 10px 0;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 14px;">
+                            <div><strong><i class="bi bi-calendar-event"></i> Data ida:</strong> ${dataIda ? new Date(dataIda + 'T00:00').toLocaleDateString('pt-BR') : 'Não informada'}</div>
+                            ${dataVolta ? `<div><strong><i class="bi bi-calendar-check"></i> Data volta:</strong> ${new Date(dataVolta + 'T00:00').toLocaleDateString('pt-BR')}</div>` : ''}
+                            <div><strong><i class="bi bi-diagram-3"></i> Classe:</strong> ${classeNome}</div>
+                            <div><strong><i class="bi bi-ticket-perforated"></i> Tipo:</strong> ${tipoPassagem}</div>
+                            <div><strong><i class="bi bi-signpost-2"></i> Distância total:</strong> ${resultado.distancia} km</div>
+                            <div><strong><i class="bi bi-people"></i> Assentos:</strong> 180 disponíveis</div>
+                            <div><strong><i class="bi bi-star"></i> Milhagem total:</strong> ${milhagemFinal} pontos</div>
+                        </div>
+                    </div>
+
+                    <p style="margin: 10px 0;"><strong><i class="bi bi-pin-map-fill"></i> Rota completa:</strong> ${resultado.caminho.join(" → ")}</p>
+                    
+                    ${trechosHTML}
+                </div>
+                
+                <div style="min-width: 200px; text-align: right;">
+                    <div style="background: linear-gradient(135deg, #f13535, #d12828); color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(241, 53, 53, 0.3);">
+                        <div style="font-size: 14px; opacity: 0.9;">Preço total</div>
+                        <div style="font-size: 32px; font-weight: bold; margin: 10px 0;">R$ ${precoFinal.toFixed(2)}</div>
+                        ${dataVolta ? `<div style="font-size: 12px; opacity: 0.8;">Ida + Volta</div>` : ''}
+                    </div>
+                    <button class="btn btn-success w-100 mt-3" style="padding: 12px; font-size: 16px; font-weight: bold;" onclick='comprarPassagem(${JSON.stringify(origem)}, ${JSON.stringify(destino)}, ${precoFinal}, ${JSON.stringify(resultado.caminho.join(" → "))}, ${milhagemFinal}, ${JSON.stringify(resultado.trechos[0].aeronave)})'>
+                        <i class="bi bi-cart-plus"></i> Comprar Passagem
+                    </button>
+                </div>
+            </div>
+        `;
+
+        lista.appendChild(div);
+    }
+
+    function comprarPassagem(origem, destino, preco, rota, milhagem, t_aeronave) {
+        const dataIda = document.getElementById("input-ida").value;
+        const dataVolta = document.getElementById("input-volta").value;
+        const classe = document.getElementById("input-classe").value;
+        
+        const Tipo_passagem = dataVolta ? "ida_volta" : "somente_ida";
+        
+        fetch("/api/comprar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                usuario_id: usuarioId,
+                origem: origem,
+                destino: destino,
+                preco: preco,
+                rota: rota,
+                data_ida: dataIda,
+                data_volta: dataVolta,
+                classe: classe,
+                n_assentos: 180,
+                t_aeronave: t_aeronave,
+                milhagem: milhagem,
+                Tipo_passagem: Tipo_passagem
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.mensagem || `Passagem de ${origem} para ${destino} no valor de R$ ${preco.toFixed(2)} adicionada ao carrinho!`);
+        })
+        .catch(err => {
+            console.error("Erro ao comprar passagem:", err);
+            alert(`Passagem de ${origem} para ${destino} no valor de R$ ${preco.toFixed(2)} adicionada ao carrinho!`);
+        });
+    }
+
+    // Definir data mínima como hoje
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById("input-ida").min = hoje;
+    document.getElementById("input-volta").min = hoje;
+</script>
+
+{% endblock %}

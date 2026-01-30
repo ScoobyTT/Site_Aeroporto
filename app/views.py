@@ -62,9 +62,7 @@ def login():
     usuario = usuario_logado()
     if usuario:
         if usuario["email"] == ADMIN_EMAIL:
-            flash("Você já está logado como administrador.", "info")
-            return render_template("index.html")
-        flash("Você já está logado.", "info")
+            return redirect(url_for("config"))
         return redirect(url_for("homepage"))
     
     form = LoginForm()
@@ -169,8 +167,8 @@ def voos():
         voo.setdefault('milhagem', voo.get('milhagem', 0))
         voo.setdefault('data_cadastro', voo.get('data_cadastro', 'N/A'))
     
-    print(f" Compras do usuário {usuario_id}: {voos_comprados_ids}")
-    print(f" Voos comprados: {len(voos_comprados)}")
+    print(f"🛒 Compras do usuário {usuario_id}: {voos_comprados_ids}")
+    print(f"✈️ Voos comprados: {len(voos_comprados)}")
     
     return render_template("voos.html", usuario=usuario, btree_voos=voos_comprados)
 
@@ -441,7 +439,7 @@ def editar_compra(compra_id):
 
 
 
-'''
+
 
 @app.route("/api/voos")
 def api_voos():
@@ -468,7 +466,7 @@ def api_voos():
     print(f" Total encontrados: {len(resultados)}\n")
     return jsonify(resultados), 200
 
-'''
+
 
 
 
@@ -561,15 +559,11 @@ def remover_cliente(id):
     salvar_json(USUARIOS_FILE, clientes)
     return jsonify({"mensagem": "Cliente removido com sucesso!"}), 200
 
-
-
-
 # ====================
 # ROTAS DE GRAFO (ADICIONAR NO FINAL DO views.py)
 # ====================
 
-from app.grafo import SistemaVoos
-
+from app.grafo import Grafo
 
 @app.route("/api/voos/com-conexao", methods=["GET"])
 def buscar_voos_com_conexao():
@@ -602,7 +596,7 @@ def buscar_voos_com_conexao():
     # Busca todas as rotas
     resultados = grafo.buscar_todas_rotas(origem, destino)
     
-    print(f"\n BUSCA COM GRAFO: {origem} → {destino}")
+    print(f"\n🔍 BUSCA COM GRAFO: {origem} → {destino}")
     print(f"   Diretos: {resultados['total_diretos']}")
     print(f"   Com conexão: {resultados['total_com_conexao']}")
     
@@ -635,138 +629,46 @@ def estatisticas_grafo():
     return jsonify(stats), 200
 
 
-
-
-
-
-@app.route('/api/voos', methods=['GET'])
-def api_voos():
+@app.route("/api/clientes/buscar", methods=["GET"])
+def buscar_cliente_por_termo():
     """
-    Busca voos diretos
-    GET /api/voos?origem=Salvador&destino=Aracaju
+    Busca cliente por termo (nome, email ou CPF) - busca parcial
+    Parâmetro: ?q=xxx
     """
-    origem = request.args.get('origem', '').strip()
-    destino = request.args.get('destino', '').strip()
+    termo = request.args.get("q", "").lower().strip()
     
-    if not origem or not destino:
-        # Retorna todos os voos se não especificar
-        return jsonify(VOOS_DISPONIVEIS)
+    if not termo:
+        return jsonify({"erro": "Parâmetro 'q' é obrigatório"}), 400
     
-    # Busca voos diretos
-    voos_encontrados = [
-        voo for voo in VOOS_DISPONIVEIS 
-        if voo['origem'] == origem and voo['destino'] == destino
-    ]
+    print(f"\n🔍 BUSCA CLIENTE: termo='{termo}'")
     
-    return jsonify(voos_encontrados)
-
-@app.route('/api/voos/com-conexao', methods=['GET'])
-def api_voos_conexao():
-    """
-    Busca voos usando o algoritmo de menor caminho do grafo
-    GET /api/voos/com-conexao?origem=Salvador&destino=Fortaleza
-    """
-    origem = request.args.get('origem', '').strip()
-    destino = request.args.get('destino', '').strip()
-    
-    if not origem or not destino:
-        return jsonify({"erro": "Origem e destino obrigatórios"}), 400
-    
-    # Voos diretos
-    diretos = [
-        voo for voo in VOOS_DISPONIVEIS 
-        if voo['origem'] == origem and voo['destino'] == destino
-    ]
-    
-    # Usa o algoritmo de menor caminho do grafo
-    caminho, distancia = menor_caminho(origem, destino)
-    
-    conexoes = []
-    if caminho and len(caminho) > 2:  # Tem conexões
-        # Monta os voos da rota
-        voos_rota = []
-        preco_total = 0
+    # Busca parcial na árvore
+    resultados = []
+    def percorrer(node):
+        if node is None:
+            return
+        for k, v in node.keys:
+            nome_match = termo in v.get("nome", "").lower()
+            email_match = termo in v.get("email", "").lower()
+            cpf_limpo = v.get("cpf", "").replace(".", "").replace("-", "").replace(" ", "")
+            termo_limpo = termo.replace(".", "").replace("-", "").replace(" ", "")
+            cpf_match = termo_limpo in cpf_limpo
+            
+            if nome_match or email_match or cpf_match:
+                resultados.append(v)
         
-        for i in range(len(caminho) - 1):
-            # Busca o voo entre caminho[i] e caminho[i+1]
-            voo = next((v for v in VOOS_DISPONIVEIS 
-                       if v['origem'] == caminho[i] and v['destino'] == caminho[i+1]), None)
-            if voo:
-                voos_rota.append(voo)
-                preco_total += voo['preco']
-        
-        # Monta resposta com estrutura que o frontend espera
-        if len(voos_rota) == 2:  # Exatamente 1 conexão
-            conexoes.append({
-                "voo1": voos_rota[0],
-                "voo2": voos_rota[1],
-                "conexao_em": caminho[1],
-                "preco_total": round(preco_total, 2)
-            })
-        elif len(voos_rota) > 2:  # Mais de 1 conexão
-            # Retorna como múltiplos voos
-            for voo in voos_rota:
-                conexoes.append({
-                    "voo1": voo,
-                    "voo2": None,
-                    "conexao_em": voo['destino'],
-                    "preco_total": preco_total
-                })
+        for child in node.children:
+            percorrer(child)
     
-    return jsonify({
-        "diretos": diretos,
-        "com_1_conexao": conexoes
-    })
-
-@app.route('/api/rota/menor-caminho', methods=['GET'])
-def api_menor_caminho():
-    """
-    Usa a função menor_caminho do grafo
-    GET /api/rota/menor-caminho?origem=Salvador&destino=Fortaleza
-    """
-    origem = request.args.get('origem', '').strip()
-    destino = request.args.get('destino', '').strip()
+    percorrer(trees.arvore_nome.root)
     
-    if not origem or not destino:
-        return jsonify({"erro": "Origem e destino obrigatórios"}), 400
+    print(f"📊 Total encontrados: {len(resultados)}\n")
     
-    # Usa sua função de menor caminho
-    caminho, distancia = menor_caminho(origem, destino)
-    
-    if not caminho:
-        return jsonify({"erro": "Caminho não encontrado"}), 404
-    
-    # Busca detalhes dos voos no caminho
-    voos = []
-    preco_total = 0
-    
-    for i in range(len(caminho) - 1):
-        voo = next((v for v in VOOS_DISPONIVEIS 
-                   if v['origem'] == caminho[i] and v['destino'] == caminho[i+1]), None)
-        if voo:
-            voos.append(voo)
-            preco_total += voo['preco']
-    
-    return jsonify({
-        "rota": caminho,
-        "voos": voos,
-        "distancia_total": distancia,
-        "preco_total": round(preco_total, 2),
-        "num_conexoes": len(caminho) - 2
-    })
-
-@app.route('/api/cidades', methods=['GET'])
-def api_listar_cidades():
-    """Lista todas as cidades do grafo"""
-    return jsonify(cidades)
-
-
-
-@app.route('/api/comprar', methods=['POST'])
-def api_comprar():
-    """Mock de compra de passagem"""
-    dados = request.get_json()
-    return jsonify({
-        "mensagem": "Compra realizada com sucesso!",
-        "voo_id": dados.get("voo_id")
-    })
+    # Se encontrou múltiplos, retorna array
+    # Se encontrou 1, retorna objeto (pra manter compatibilidade)
+    if len(resultados) == 0:
+        return jsonify({"mensagem": "Nenhum cliente encontrado"}), 404
+    elif len(resultados) == 1:
+        return jsonify(resultados[0]), 200
+    else:
+        return jsonify(resultados), 200

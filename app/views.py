@@ -167,7 +167,7 @@ def voos():
         voo.setdefault('milhagem', voo.get('milhagem', 0))
         voo.setdefault('data_cadastro', voo.get('data_cadastro', 'N/A'))
     
-    print(f"🛒 Compras do usuário {usuario_id}: {voos_comprados_ids}")
+    print(f" Compras do usuário {usuario_id}: {voos_comprados_ids}")
     print(f"✈️ Voos comprados: {len(voos_comprados)}")
     
     return render_template("voos.html", usuario=usuario, btree_voos=voos_comprados)
@@ -596,7 +596,7 @@ def buscar_voos_com_conexao():
     # Busca todas as rotas
     resultados = grafo.buscar_todas_rotas(origem, destino)
     
-    print(f"\n🔍 BUSCA COM GRAFO: {origem} → {destino}")
+    print(f"\n BUSCA COM GRAFO: {origem} → {destino}")
     print(f"   Diretos: {resultados['total_diretos']}")
     print(f"   Com conexão: {resultados['total_com_conexao']}")
     
@@ -662,7 +662,7 @@ def buscar_cliente_por_termo():
     
     percorrer(trees.arvore_nome.root)
     
-    print(f"📊 Total encontrados: {len(resultados)}\n")
+    print(f" Total encontrados: {len(resultados)}\n")
     
     # Se encontrou múltiplos, retorna array
     # Se encontrou 1, retorna objeto (pra manter compatibilidade)
